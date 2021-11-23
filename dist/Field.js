@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Field = void 0;
+class Field {
+    constructor(name, type) {
+        this.name = name;
+        this.type = type;
+    }
+}
+exports.Field = Field;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRmllbGQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvRmllbGQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBUUEsTUFBYSxLQUFLO0lBSWYsWUFBWSxJQUFZLEVBQUUsSUFBVztRQUNsQyxJQUFJLENBQUMsSUFBSSxHQUFHLElBQUksQ0FBQTtRQUNoQixJQUFJLENBQUMsSUFBSSxHQUFHLElBQUksQ0FBQTtJQUNuQixDQUFDO0NBQ0g7QUFSRCxzQkFRQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IElUeXBlIH0gZnJvbSBcIi4vdmFsdWVzL1R5cGVcIjtcblxuXG5leHBvcnQgaW50ZXJmYWNlIElGaWVsZCB7XG4gICByZWFkb25seSBuYW1lOiBzdHJpbmdcbiAgIHJlYWRvbmx5IHR5cGU6IElUeXBlXG59XG5cbmV4cG9ydCBjbGFzcyBGaWVsZCBpbXBsZW1lbnRzIElGaWVsZCB7XG4gICByZWFkb25seSBuYW1lOiBzdHJpbmdcbiAgIHJlYWRvbmx5IHR5cGU6IElUeXBlXG5cbiAgIGNvbnN0cnVjdG9yKG5hbWU6IHN0cmluZywgdHlwZTogSVR5cGUpIHtcbiAgICAgIHRoaXMubmFtZSA9IG5hbWVcbiAgICAgIHRoaXMudHlwZSA9IHR5cGVcbiAgIH1cbn0iXX0=

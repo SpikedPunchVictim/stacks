@@ -1,0 +1,49 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ObjectRefValue = exports.ObjectRefType = void 0;
+const Type_1 = require("./Type");
+const Value_1 = require("./Value");
+class ObjectRefType extends Type_1.Type {
+    constructor(modelName, context) {
+        super(Type_1.TypeSet.ObjectRef);
+        this.modelName = modelName;
+        this.context = context;
+    }
+    get orchestrator() {
+        return this.context.orchestrator;
+    }
+    equals(other) {
+        if (other.type !== Type_1.TypeSet.ObjectRef) {
+            return false;
+        }
+        let cast = other;
+        if (cast.modelName.toLowerCase() !== this.modelName.toLowerCase()) {
+            return false;
+        }
+        return true;
+    }
+    async validate(obj) {
+        if (typeof obj !== 'string') {
+            return { success: false, error: new Error(`Type does not match. Expected 'string' for id and receieved '${typeof obj}'`) };
+        }
+        let id = obj;
+        let model = this.context.cache.getModel(this.modelName);
+        if (model === undefined) {
+            throw new Error(`Error encountered when validating an Object. No Model exists with the name ${this.modelName}.`);
+        }
+        let found = await this.orchestrator.getObject(model, id);
+        if (found === undefined) {
+            return { success: false, error: new Error(`The Object referenced (id: ${id}) doesn't exist`) };
+        }
+        return { success: true };
+    }
+}
+exports.ObjectRefType = ObjectRefType;
+class ObjectRefValue extends Value_1.Value {
+    constructor(modelName, id, context) {
+        super(new ObjectRefType(modelName, context));
+        this.id = id;
+    }
+}
+exports.ObjectRefValue = ObjectRefValue;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiT2JqZWN0UmVmLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL3ZhbHVlcy9PYmplY3RSZWYudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBRUEsaUNBQThEO0FBQzlELG1DQUFnQztBQUVoQyxNQUFhLGFBQWMsU0FBUSxXQUFJO0lBS3BDLFlBQXFCLFNBQWlCLEVBQVcsT0FBc0I7UUFDcEUsS0FBSyxDQUFDLGNBQU8sQ0FBQyxTQUFTLENBQUMsQ0FBQTtRQUROLGNBQVMsR0FBVCxTQUFTLENBQVE7UUFBVyxZQUFPLEdBQVAsT0FBTyxDQUFlO0lBRXZFLENBQUM7SUFORCxJQUFJLFlBQVk7UUFDYixPQUFPLElBQUksQ0FBQyxPQUFPLENBQUMsWUFBWSxDQUFBO0lBQ25DLENBQUM7SUFNRCxNQUFNLENBQUMsS0FBWTtRQUNoQixJQUFHLEtBQUssQ0FBQyxJQUFJLEtBQUssY0FBTyxDQUFDLFNBQVMsRUFBRTtZQUNsQyxPQUFPLEtBQUssQ0FBQTtTQUNkO1FBRUQsSUFBSSxJQUFJLEdBQUcsS0FBc0IsQ0FBQTtRQUVqQyxJQUFHLElBQUksQ0FBQyxTQUFTLENBQUMsV0FBVyxFQUFFLEtBQUssSUFBSSxDQUFDLFNBQVMsQ0FBQyxXQUFXLEVBQUUsRUFBRTtZQUMvRCxPQUFPLEtBQUssQ0FBQTtTQUNkO1FBRUQsT0FBTyxJQUFJLENBQUE7SUFDZCxDQUFDO0lBRUQsS0FBSyxDQUFDLFFBQVEsQ0FBSSxHQUFNO1FBQ3JCLElBQUcsT0FBTyxHQUFHLEtBQUssUUFBUSxFQUFFO1lBQ3pCLE9BQU8sRUFBRSxPQUFPLEVBQUUsS0FBSyxFQUFFLEtBQUssRUFBRSxJQUFJLEtBQUssQ0FBQyxnRUFBZ0UsT0FBTyxHQUFHLEdBQUcsQ0FBQyxFQUFDLENBQUE7U0FDM0g7UUFFRCxJQUFJLEVBQUUsR0FBRyxHQUFhLENBQUE7UUFFdEIsSUFBSSxLQUFLLEdBQUcsSUFBSSxDQUFDLE9BQU8sQ0FBQyxLQUFLLENBQUMsUUFBUSxDQUFDLElBQUksQ0FBQyxTQUFTLENBQUMsQ0FBQTtRQUV2RCxJQUFHLEtBQUssS0FBSyxTQUFTLEVBQUU7WUFDckIsTUFBTSxJQUFJLEtBQUssQ0FBQyw4RUFBOEUsSUFBSSxDQUFDLFNBQVMsR0FBRyxDQUFDLENBQUE7U0FDbEg7UUFFRCxJQUFJLEtBQUssR0FBRyxNQUFNLElBQUksQ0FBQyxZQUFZLENBQUMsU0FBUyxDQUFDLEtBQUssRUFBRSxFQUFFLENBQUMsQ0FBQTtRQUV4RCxJQUFHLEtBQUssS0FBSyxTQUFTLEVBQUU7WUFDckIsT0FBTyxFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsS0FBSyxFQUFFLElBQUksS0FBSyxDQUFDLDhCQUE4QixFQUFFLGlCQUFpQixDQUFDLEVBQUMsQ0FBQTtTQUMvRjtRQUVELE9BQU8sRUFBRSxPQUFPLEVBQUUsSUFBSSxFQUFFLENBQUE7SUFDM0IsQ0FBQztDQUNIO0FBNUNELHNDQTRDQztBQUVELE1BQWEsY0FBZSxTQUFRLGFBQUs7SUFHdEMsWUFBWSxTQUFpQixFQUFFLEVBQVUsRUFBRSxPQUFzQjtRQUM5RCxLQUFLLENBQUMsSUFBSSxhQUFhLENBQUMsU0FBUyxFQUFFLE9BQU8sQ0FBQyxDQUFDLENBQUE7UUFDNUMsSUFBSSxDQUFDLEVBQUUsR0FBRyxFQUFFLENBQUE7SUFDZixDQUFDO0NBQ0g7QUFQRCx3Q0FPQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IElPcmNoZXN0cmF0b3IgfSBmcm9tIFwiLi4vb3JjaGVzdHJhdG9yL09yY2hlc3RyYXRvclwiO1xuaW1wb3J0IHsgSVN0YWNrQ29udGV4dCB9IGZyb20gXCIuLi9zdGFjay9TdGFja0NvbnRleHRcIjtcbmltcG9ydCB7IElUeXBlLCBUeXBlLCBUeXBlU2V0LCBWYWxpZGF0ZVJlc3VsdCB9IGZyb20gXCIuL1R5cGVcIjtcbmltcG9ydCB7IFZhbHVlIH0gZnJvbSBcIi4vVmFsdWVcIjtcblxuZXhwb3J0IGNsYXNzIE9iamVjdFJlZlR5cGUgZXh0ZW5kcyBUeXBlIHtcbiAgIGdldCBvcmNoZXN0cmF0b3IoKTogSU9yY2hlc3RyYXRvciB7XG4gICAgICByZXR1cm4gdGhpcy5jb250ZXh0Lm9yY2hlc3RyYXRvclxuICAgfVxuXG4gICBjb25zdHJ1Y3RvcihyZWFkb25seSBtb2RlbE5hbWU6IHN0cmluZywgcmVhZG9ubHkgY29udGV4dDogSVN0YWNrQ29udGV4dCkge1xuICAgICAgc3VwZXIoVHlwZVNldC5PYmplY3RSZWYpXG4gICB9XG5cbiAgIGVxdWFscyhvdGhlcjogSVR5cGUpOiBib29sZWFuIHtcbiAgICAgIGlmKG90aGVyLnR5cGUgIT09IFR5cGVTZXQuT2JqZWN0UmVmKSB7XG4gICAgICAgICByZXR1cm4gZmFsc2VcbiAgICAgIH1cblxuICAgICAgbGV0IGNhc3QgPSBvdGhlciBhcyBPYmplY3RSZWZUeXBlXG5cbiAgICAgIGlmKGNhc3QubW9kZWxOYW1lLnRvTG93ZXJDYXNlKCkgIT09IHRoaXMubW9kZWxOYW1lLnRvTG93ZXJDYXNlKCkpIHtcbiAgICAgICAgIHJldHVybiBmYWxzZVxuICAgICAgfVxuXG4gICAgICByZXR1cm4gdHJ1ZVxuICAgfVxuXG4gICBhc3luYyB2YWxpZGF0ZTxUPihvYmo6IFQpOiBQcm9taXNlPFZhbGlkYXRlUmVzdWx0PiB7XG4gICAgICBpZih0eXBlb2Ygb2JqICE9PSAnc3RyaW5nJykge1xuICAgICAgICAgcmV0dXJuIHsgc3VjY2VzczogZmFsc2UsIGVycm9yOiBuZXcgRXJyb3IoYFR5cGUgZG9lcyBub3QgbWF0Y2guIEV4cGVjdGVkICdzdHJpbmcnIGZvciBpZCBhbmQgcmVjZWlldmVkICcke3R5cGVvZiBvYmp9J2ApfVxuICAgICAgfVxuXG4gICAgICBsZXQgaWQgPSBvYmogYXMgc3RyaW5nXG5cbiAgICAgIGxldCBtb2RlbCA9IHRoaXMuY29udGV4dC5jYWNoZS5nZXRNb2RlbCh0aGlzLm1vZGVsTmFtZSlcblxuICAgICAgaWYobW9kZWwgPT09IHVuZGVmaW5lZCkge1xuICAgICAgICAgdGhyb3cgbmV3IEVycm9yKGBFcnJvciBlbmNvdW50ZXJlZCB3aGVuIHZhbGlkYXRpbmcgYW4gT2JqZWN0LiBObyBNb2RlbCBleGlzdHMgd2l0aCB0aGUgbmFtZSAke3RoaXMubW9kZWxOYW1lfS5gKVxuICAgICAgfVxuXG4gICAgICBsZXQgZm91bmQgPSBhd2FpdCB0aGlzLm9yY2hlc3RyYXRvci5nZXRPYmplY3QobW9kZWwsIGlkKVxuXG4gICAgICBpZihmb3VuZCA9PT0gdW5kZWZpbmVkKSB7XG4gICAgICAgICByZXR1cm4geyBzdWNjZXNzOiBmYWxzZSwgZXJyb3I6IG5ldyBFcnJvcihgVGhlIE9iamVjdCByZWZlcmVuY2VkIChpZDogJHtpZH0pIGRvZXNuJ3QgZXhpc3RgKX1cbiAgICAgIH1cblxuICAgICAgcmV0dXJuIHsgc3VjY2VzczogdHJ1ZSB9XG4gICB9XG59XG5cbmV4cG9ydCBjbGFzcyBPYmplY3RSZWZWYWx1ZSBleHRlbmRzIFZhbHVlIHtcbiAgIGlkOiBzdHJpbmdcblxuICAgY29uc3RydWN0b3IobW9kZWxOYW1lOiBzdHJpbmcsIGlkOiBzdHJpbmcsIGNvbnRleHQ6IElTdGFja0NvbnRleHQpIHtcbiAgICAgIHN1cGVyKG5ldyBPYmplY3RSZWZUeXBlKG1vZGVsTmFtZSwgY29udGV4dCkpXG4gICAgICB0aGlzLmlkID0gaWRcbiAgIH1cbn0iXX0=

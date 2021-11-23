@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GetManyObjectsEvent = void 0;
+const Event_1 = require("./Event");
+class GetManyObjectsEvent extends Event_1.Event {
+    constructor(model, options) {
+        super(Event_1.EventSet.GetManyObjects);
+        this.model = model;
+        this.options = options;
+        this.results = undefined;
+    }
+}
+exports.GetManyObjectsEvent = GetManyObjectsEvent;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiR2V0TWFueU9iamVjdHNFdmVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9ldmVudHMvR2V0TWFueU9iamVjdHNFdmVudC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFDQSxtQ0FBMEM7QUFHMUMsTUFBYSxtQkFBdUIsU0FBUSxhQUFLO0lBRzlDLFlBQXFCLEtBQWEsRUFBVyxPQUFvQjtRQUM5RCxLQUFLLENBQUMsZ0JBQVEsQ0FBQyxjQUFjLENBQUMsQ0FBQTtRQURaLFVBQUssR0FBTCxLQUFLLENBQVE7UUFBVyxZQUFPLEdBQVAsT0FBTyxDQUFhO1FBRmpFLFlBQU8sR0FBZ0MsU0FBUyxDQUFBO0lBSWhELENBQUM7Q0FDSDtBQU5ELGtEQU1DIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgSU1vZGVsLCBQYWdlUmVxdWVzdCwgUGFnZVJlc3BvbnNlIH0gZnJvbSBcIi4uL01vZGVsXCI7XG5pbXBvcnQgeyBFdmVudCwgRXZlbnRTZXQgfSBmcm9tIFwiLi9FdmVudFwiO1xuXG5cbmV4cG9ydCBjbGFzcyBHZXRNYW55T2JqZWN0c0V2ZW50PFQ+IGV4dGVuZHMgRXZlbnQge1xuICAgcmVzdWx0czogUGFnZVJlc3BvbnNlPFQ+IHwgdW5kZWZpbmVkID0gdW5kZWZpbmVkXG5cbiAgIGNvbnN0cnVjdG9yKHJlYWRvbmx5IG1vZGVsOiBJTW9kZWwsIHJlYWRvbmx5IG9wdGlvbnM6IFBhZ2VSZXF1ZXN0KSB7XG4gICAgICBzdXBlcihFdmVudFNldC5HZXRNYW55T2JqZWN0cylcbiAgIH1cbn0iXX0=

@@ -1,0 +1,158 @@
+Supported Types:
+   : string
+   : uint
+   : int
+   : 
+
+
+import stacks, { StackBase } from '@spiekdpunch/stacks'
+
+
+type UserType = {
+   name: string
+   age: number
+   father: UserType
+} & StackBase
+
+enum Color {
+   Red = 'red',
+   Blue = 'blue',
+   Green = 'green'
+}
+
+let stack = stacks.create()
+
+stack.create.model()
+stack.delete.model()
+stack.update.model()
+stack.get.modelById()
+stack.get.modelByName()
+
+// Applys all of the Models to the underlying systems
+stack.bootstrap()
+
+// Can create() be called offline
+// It will just create the Shells
+// of the Types. To bootstrap the
+// underlying data sources, we could
+// call await stack.bootstrap()
+
+let Team: IModel = await stack.create.model('team', {
+   name: ''
+   // ...
+})
+
+let User: IModel = await stack.create.model('user', {
+   name: '', // ({ int }) => int(-5)
+   age: 0,   // ({ uint }) => uint(3)
+   father: ({ inl }, ctx) => inl(ctx.model),
+   dog: ({ inl }) =>
+   team: ({ ref }) => ref(Team),
+   color: ({ enum }) => enum(Color, Color.Red),
+   items: {
+      type: ({ array, int }) => array(int),
+      value: [1, 2, 3, 4] // ({ int }) => [ int(1), int(2), int(3), int(4) ],
+      symbols: [
+         { name: 'dynamo:table', value: 'xxxx' }
+      ]
+   }
+})
+
+export {
+   User,
+   Team
+}
+
+let user: UserType = await User.create({ name: 'chris' })
+let father: UserType = await User.get(id)
+
+// alternatively
+await stack.create.object()
+await stack.create.object(User, { name: 'chris' })
+
+user.father = father
+user.age = 35
+await User.validate(user)
+await User.save(user)
+
+// Or
+let bondedUser: IBondedObject = BondedObject.get(user)
+await bondedUser.save()
+
+// Update
+await User.update(user, (updated, exists) => // Pass in updated object and its ExistSatte  )
+
+stack.async.on(Events.InstanceCreated, async (action) => {
+
+})
+
+
+interface IRequest {
+   success(): Promise<void>
+   failure(): Promise<void>
+}
+
+class RequestForChange {
+   commit(request: IRequest): Promise<void>
+}
+
+
+let rest = new RestPlugin()
+await stack.use(rest)
+await stack.use(mongo)
+
+rest.get('/users', User)
+rest.post('/users', User)
+
+rest.lisetn()
+
+let dynamo = new DynamoDbPlugin({
+   models: [User, Team]
+})
+
+await stack.use(dynamo)
+
+let redis = new RedisPlugin()
+await stack.use(redis)
+
+
+
+//-- Plugin
+
+setup(router) {
+   router.register(GetObjectEvent.name, async (event) => {
+      event.object = await getObject()
+   })
+
+   router.register(BootstrapEvent.name, async (event) => {
+      for(let model of event.models) {
+         let options = {}
+
+         for(let member of model.members) {
+            otpions[member.name] = convertToSchemaType(member.value)
+         }
+
+         // These are actually Models in Mongoose
+         this.schemas.push(new Schema(options))
+      }
+   })
+
+   router.register(SaveObjectEvent.name, async (event) => {
+      // Mongoose example
+      let schema = this.schemas.get(event.model.name)
+      let obj = new schema()
+
+      // This object is a Sereializable Object
+      event.serialized.fields.switch({
+
+      })
+   })
+}
+
+
+
+*/
+
+/*
+   Model
+*/

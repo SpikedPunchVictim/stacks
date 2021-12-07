@@ -1,0 +1,8 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isEnum = void 0;
+function isEnum(enm, obj) {
+    return Object.values(enm).includes(obj);
+}
+exports.isEnum = isEnum;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiT2JqZWN0cy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy91dGlscy9PYmplY3RzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7OztBQUFBLFNBQWdCLE1BQU0sQ0FBSSxHQUFRLEVBQUUsR0FBUTtJQUN6QyxPQUFPLE1BQU0sQ0FBQyxNQUFNLENBQUMsR0FBRyxDQUFDLENBQUMsUUFBUSxDQUFDLEdBQVEsQ0FBQyxDQUFBO0FBQy9DLENBQUM7QUFGRCx3QkFFQyIsInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBmdW5jdGlvbiBpc0VudW08VD4oZW5tOiBhbnksIG9iajogYW55KTogYm9vbGVhbiB7XG4gICByZXR1cm4gT2JqZWN0LnZhbHVlcyhlbm0pLmluY2x1ZGVzKG9iaiBhcyBUKVxufSJdfQ==

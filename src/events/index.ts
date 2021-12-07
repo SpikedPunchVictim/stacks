@@ -1,1 +1,0 @@
-export { GetObjectEvent } from './GetObjectEvent'

@@ -5,6 +5,45 @@
    "version": "0.2.0",
    "configurations": [
       {
+         "version": "0.2.0",
+         "configurations": [
+            {
+               "name": "[stacks] Debug Tests",
+               "type": "node",
+               "request": "launch",
+               "runtimeArgs": [
+                  "--inspect-brk",
+                  "${workspaceRoot}/node_modules/.bin/jest",
+                  "--runInBand"
+               ],
+               "console": "integratedTerminal",
+               "internalConsoleOptions": "neverOpen",
+               "port": 9229
+            }
+         ]
+      },
+      {
+         "name": "[stacks] TS | Current File",
+         "type": "node",
+         "request": "launch",
+         "args": [
+            "${relativeFile}"
+         ],
+         "runtimeArgs": [
+            "--nolazy",
+            "-r",
+            "ts-node/register"
+         ],
+         "sourceMaps": true,
+         "cwd": "${workspaceRoot}",
+         "protocol": "inspector",
+         "smartStep": true,
+         "skipFiles": [
+            "<node_internals>/**",
+            "node_modules/**"
+         ],
+      }
+      {
          "type": "pwa-node",
          "request": "launch",
          "name": "Launch Program",
@@ -22,13 +61,13 @@
          "type": "node",
          "request": "launch",
          "runtimeArgs": [
-           "--inspect-brk",
-           "${workspaceRoot}/node_modules/.bin/jest",
-           "--runInBand"
+            "--inspect-brk",
+            "${workspaceRoot}/node_modules/.bin/jest",
+            "--runInBand"
          ],
          "console": "integratedTerminal",
          "internalConsoleOptions": "neverOpen",
          "port": 9229
-       }
+      }
    ]
 }

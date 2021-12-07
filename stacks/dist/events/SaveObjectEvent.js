@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SaveObjectEvent = void 0;
+const Event_1 = require("./Event");
+class SaveObjectEvent extends Event_1.Event {
+    constructor(model, obj, serialize) {
+        super(Event_1.EventSet.CommitObject);
+        this.model = model;
+        this.obj = obj;
+        this.serialize = serialize;
+    }
+}
+exports.SaveObjectEvent = SaveObjectEvent;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU2F2ZU9iamVjdEV2ZW50LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2V2ZW50cy9TYXZlT2JqZWN0RXZlbnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBRUEsbUNBQTBDO0FBSTFDLE1BQWEsZUFBdUMsU0FBUSxhQUFLO0lBQzlELFlBQXFCLEtBQWEsRUFBVyxHQUFNLEVBQVcsU0FBdUI7UUFDbEYsS0FBSyxDQUFDLGdCQUFRLENBQUMsWUFBWSxDQUFDLENBQUE7UUFEVixVQUFLLEdBQUwsS0FBSyxDQUFRO1FBQVcsUUFBRyxHQUFILEdBQUcsQ0FBRztRQUFXLGNBQVMsR0FBVCxTQUFTLENBQWM7SUFFckYsQ0FBQztDQUNIO0FBSkQsMENBSUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBTdGFja09iamVjdCB9IGZyb20gXCIuLi9TdGFja09iamVjdFwiO1xuaW1wb3J0IHsgSU1vZGVsIH0gZnJvbSBcIi4uL01vZGVsXCI7XG5pbXBvcnQgeyBFdmVudCwgRXZlbnRTZXQgfSBmcm9tIFwiLi9FdmVudFwiO1xuaW1wb3J0IHsgSVByb3h5T2JqZWN0IH0gZnJvbSBcIi4uL1Byb3h5T2JqZWN0XCI7XG5cblxuZXhwb3J0IGNsYXNzIFNhdmVPYmplY3RFdmVudDxUIGV4dGVuZHMgU3RhY2tPYmplY3Q+IGV4dGVuZHMgRXZlbnQge1xuICAgY29uc3RydWN0b3IocmVhZG9ubHkgbW9kZWw6IElNb2RlbCwgcmVhZG9ubHkgb2JqOiBULCByZWFkb25seSBzZXJpYWxpemU6IElQcm94eU9iamVjdCkge1xuICAgICAgc3VwZXIoRXZlbnRTZXQuQ29tbWl0T2JqZWN0KVxuICAgfVxufSJdfQ==

@@ -19,7 +19,20 @@ import { IValueSerializer } from "../serialize/ValueSerializer";
 export interface IOrchestrator {
    // TODO: Add: createModel, deleteModel (these should assist in running tests)
 
+   /**
+    * Saves an Object to the backend.
+    * 
+    * @param model The Model
+    * @param obj The Object to Save
+    */
    saveObject<T extends StackObject>(model: IModel, obj: T): Promise<void>
+
+   /**
+    * Deletes an Object from the backend
+    * 
+    * @param model The Model
+    * @param obj The Object to delete
+    */
    deleteObject<T extends StackObject>(model: IModel, obj: T): Promise<void>
 
    /**
@@ -37,7 +50,21 @@ export interface IOrchestrator {
     * @param id The Object's ID
     */
    getObject<T extends StackObject>(model: IModel, id: string): Promise<T | undefined>
+
+   /**
+    * Determines if an ID is already in use.
+    * 
+    * @param id The ID to test
+    */
    hasId(id: string): Promise<boolean>
+   
+   /**
+    * Updates the values of an Object
+    * 
+    * @param model The Model of the Object
+    * @param obj The Object to update
+    * @param onUpdate Handler that is called after an Object has been updated
+    */
    updateObject<T extends StackObject>(model: IModel, obj: T, onUpdate: UpdateObjectHandler<T>): Promise<void>
 }
 
@@ -73,14 +100,14 @@ export class Orchestrator implements IOrchestrator {
     * @param obj The Object to save. Note that this is really a Proxy'd SerializableObject
     */
    async saveObject<T extends StackObject>(model: IModel, obj: T): Promise<void> {
+      if(obj.id === UidKeeper.IdNotSet) {
+         obj.id = await this.uid.generate()
+      }
+      
       let validations = await model.validate(obj)
 
       if (!validations.success) {
          throw new Error(`Cannot Save Object with ID ${obj.id} since it fails validation. Reason: ${validations.results.map(r => r.error)}`)
-      }
-
-      if(obj.id === UidKeeper.IdNotSet) {
-         obj.id = await this.uid.generate()
       }
 
       //@ts-ignore
@@ -89,7 +116,7 @@ export class Orchestrator implements IOrchestrator {
       await this.rfc.create(new SaveObjectEvent<T>(model, obj, serialized))
          .fulfill(async (event) => {
             this.cache.saveObject(model, obj)
-            await this.stack.emit(EventSet.CommitObject, event)
+            await this.stack.emit(EventSet.SaveObject, event)
          })
          .commit()
    }
@@ -103,6 +130,8 @@ export class Orchestrator implements IOrchestrator {
       await this.rfc.create(new GetManyObjectsEvent(model, options))
          .fulfill(async (event) => {
             let cast = event as GetManyObjectsEvent<T>
+
+            await this.stack.emit(EventSet.GetManyObjects, cast)
 
             if (cast.results !== undefined) {
                results = cast.results
@@ -215,6 +244,8 @@ export class Orchestrator implements IOrchestrator {
          .fulfill(async (event) => {
             let cast = event as HasIdEvent
 
+            await this.stack.emit(EventSet.HasId, event)
+
             if (cast.hasId) {
                hasId = true
                return
@@ -245,7 +276,7 @@ export class Orchestrator implements IOrchestrator {
 
             await onUpdate(updated, cast.exists)
 
-            await this.stack.emit(EventSet.ObjectUpdated, cast)
+            await this.stack.emit(EventSet.ObjectUpdated, event)
          })
          .commit()
    }

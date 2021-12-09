@@ -1,11 +1,11 @@
 export declare enum EventSet {
-    CommitObject = "commit-object",
     GetManyObjects = "get-many-objects",
     GetObject = "get-object",
     HasId = "has-id",
     ObjectCreated = "object-created",
     ObjectDeleted = "object-deleted",
-    ObjectUpdated = "object-updated"
+    ObjectUpdated = "object-updated",
+    SaveObject = "commit-object"
 }
 export declare enum EventState {
     Raised = "raised",

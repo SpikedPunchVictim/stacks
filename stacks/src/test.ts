@@ -41,6 +41,10 @@ async function main(): Promise<void> {
       ggs.push(await GG.create())
    }
 
+   let paged = await GG.getMany()
+
+   console.dir(paged)
+
    let Team = await stack.create.model('team', {
       name: '',
       manager: 'mother'

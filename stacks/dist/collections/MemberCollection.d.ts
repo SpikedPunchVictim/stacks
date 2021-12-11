@@ -2,7 +2,7 @@ import { IMember, MemberValue } from "../Member";
 import { IModel, ModelCreateParams } from '../Model';
 import { IStackContext } from "../stack/StackContext";
 import { IUidKeeper } from "../UidKeeper";
-export declare type VisitHandler<T> = (value: T, index: number, array: Array<T>) => void;
+import { VisitHandler } from "./Handlers";
 export interface IMemberCollection {
     readonly model: IModel;
     [Symbol.iterator](): Iterator<IMember>;
@@ -10,6 +10,12 @@ export interface IMemberCollection {
     append(obj: ModelCreateParams): Promise<void>;
     delete(name: string): Promise<void>;
     find(predicate: VisitHandler<IMember>): IMember | undefined;
+    /**
+     * Maps the Members into another structure
+     *
+     * @param visit Handler used to transform each Field
+     */
+    map<T>(visit: VisitHandler<IMember>): void[];
     get(name: string): IMember | undefined;
 }
 export declare class MemberCollection implements IMemberCollection {
@@ -23,5 +29,6 @@ export declare class MemberCollection implements IMemberCollection {
     append(obj: ModelCreateParams): Promise<void>;
     delete(name: string): Promise<void>;
     find(predicate: VisitHandler<IMember>): IMember | undefined;
+    map<T>(visit: VisitHandler<IMember>): void[];
     get(name: string): IMember | undefined;
 }

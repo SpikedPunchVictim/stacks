@@ -8,16 +8,26 @@ import { GetManyObjectsEvent } from "../events/GetManyObjectsEvent";
 import { HasIdEvent } from "../events/HasIdEvent";
 import { IRequestForChangeSource } from "../events/RequestForChange";
 import { UpdateObjectEvent } from "../events/UpdateObjectEvent";
-import { IModel, PageRequest, PageResponse } from "../Model";
+import { IModel, ObjectCreateParams, PageRequest, PageResponse } from "../Model";
 import { IStack } from "../stack/Stack";
 import { IStackContext } from "../stack/StackContext";
 import { UpdateObjectHandler } from "../stack/StackUpdate";
 import { ProxyObject } from "../ProxyObject";
 import { IUidKeeper, UidKeeper } from "../UidKeeper";
 import { IValueSerializer } from "../serialize/ValueSerializer";
+import { CreateObjectEvent } from "../events/CreateObjectEvent";
 
 export interface IOrchestrator {
    // TODO: Add: createModel, deleteModel (these should assist in running tests)
+
+   /**
+    * Creates a new Object in memory only. Not indended to be stored on the backend.
+    * Objects created this way have no ID assigned to them until they are saved.
+    * 
+    * @param model The Model
+    * @param params The Object Creation Params 
+    */
+   createObject<T extends StackObject>(model: IModel, params: ObjectCreateParams): Promise<T>
 
    /**
     * Saves an Object to the backend.
@@ -94,6 +104,18 @@ export class Orchestrator implements IOrchestrator {
 
    }
 
+   async createObject<T extends StackObject>(model: IModel, params: ObjectCreateParams): Promise<T> {
+      let created = await ProxyObject.fromCreated<T>(model, params, this.context) as T
+
+      await this.rfc.create(new CreateObjectEvent(model, created))
+         .fulfill(async (event) => {
+            await this.stack.emit(EventSet.ObjectCreated, event)
+         })
+         .commit()
+
+      return created
+   }
+
    /**
     * 
     * @param model The Model
@@ -157,10 +179,10 @@ export class Orchestrator implements IOrchestrator {
 
             if (cursor === '') {
                // For an empty cursor we start from the beginning
-               let items = objects.slice(0, Math.min(objects.length - 1, limit))
+               let items = objects.slice(0, Math.min(objects.length, limit))
 
                if (items.length == limit && objects.length > limit) {
-                  results.cursor = Buffer.from(objects[limit + 1].id).toString('base64')
+                  results.cursor = Buffer.from(objects[limit].id).toString('base64')
                } else {
                   // If there are no more entries in thenext set, we default the cursor
                   // to empty string
@@ -181,12 +203,13 @@ export class Orchestrator implements IOrchestrator {
                   return
                }
 
-               results.items = objects.slice(index, Math.min(objects.length - 1, limit))
+               let nextIndex = index + limit
+               results.items = objects.slice(index, nextIndex)
 
-               if (results.items.length == limit && objects.length > limit) {
-                  results.cursor = Buffer.from(objects[limit + 1].id).toString('base64')
+               if (objects.length > nextIndex) {
+                  results.cursor = Buffer.from(objects[nextIndex].id).toString('base64')
                } else {
-                  // If there are no more entries in thenext set, we default the cursor
+                  // If there are no more entries in the next set, we default the cursor
                   // to empty string
                   results.cursor = ''
                }

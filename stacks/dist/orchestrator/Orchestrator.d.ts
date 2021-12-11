@@ -1,13 +1,21 @@
 import { StackObject } from "../StackObject";
 import { ICache } from "../Cache";
 import { IRequestForChangeSource } from "../events/RequestForChange";
-import { IModel, PageRequest, PageResponse } from "../Model";
+import { IModel, ObjectCreateParams, PageRequest, PageResponse } from "../Model";
 import { IStack } from "../stack/Stack";
 import { IStackContext } from "../stack/StackContext";
 import { UpdateObjectHandler } from "../stack/StackUpdate";
 import { IUidKeeper } from "../UidKeeper";
 import { IValueSerializer } from "../serialize/ValueSerializer";
 export interface IOrchestrator {
+    /**
+     * Creates a new Object in memory only. Not indended to be stored on the backend.
+     * Objects created this way have no ID assigned to them until they are saved.
+     *
+     * @param model The Model
+     * @param params The Object Creation Params
+     */
+    createObject<T extends StackObject>(model: IModel, params: ObjectCreateParams): Promise<T>;
     /**
      * Saves an Object to the backend.
      *
@@ -59,6 +67,7 @@ export declare class Orchestrator implements IOrchestrator {
     get stack(): IStack;
     get uid(): IUidKeeper;
     constructor(context: IStackContext);
+    createObject<T extends StackObject>(model: IModel, params: ObjectCreateParams): Promise<T>;
     /**
      *
      * @param model The Model

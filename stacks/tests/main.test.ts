@@ -1,6 +1,6 @@
 import { IModel, IValueSource, Stack, StackObject } from '../src'
 import { UidKeeper } from '../src/UidKeeper'
-import { validateModel, validateObject } from './Utils'
+import { createScenario, validateModel, validateObject } from './Utils'
 
 const ModelNames = {
    FlatType: 'flattype',
@@ -315,10 +315,65 @@ describe(`# Objects`, () => {
 
       expect(obj).not.toBeUndefined()
 
+      await model.save(obj)
+
       await model.delete(obj)
 
       let found = await stack.get.object(model.name, id)
       expect(found).toBeUndefined()
+   })
+
+   test(`Can get()`, async () => {
+      let { model } = await createScenario()
+
+      let obj = await model.create()
+      await model.save(obj)
+
+      let found = await model.get(obj.id)
+
+      expect(found).not.toBeUndefined()
+   })
+
+   test(`Can getAll()`, async () => {
+      let { model } = await createScenario()
+      let count = 1000
+
+      for(let i = 0; i < count; ++i) {
+         let obj = await model.create()
+         await model.save(obj)
+      }
+
+      let objs = await model.getAll()
+
+      expect(objs.length).toEqual(count)
+   })
+
+   test(`Can getAll() :: Less than limit`, async () => {
+      let { model } = await createScenario()
+      let count = 50
+
+      for(let i = 0; i < count; ++i) {
+         let obj = await model.create()
+         await model.save(obj)
+      }
+
+      let objs = await model.getAll()
+
+      expect(objs.length).toEqual(count)
+   })
+
+   test(`Can getAll() :: Just over limit`, async () => {
+      let { model } = await createScenario()
+      let count = 115
+
+      for(let i = 0; i < count; ++i) {
+         let obj = await model.create()
+         await model.save(obj)
+      }
+
+      let objs = await model.getAll()
+
+      expect(objs.length).toEqual(count)
    })
 })
 

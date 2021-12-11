@@ -47,7 +47,7 @@ export interface IType {
    equals(other: IType): boolean
 
    /**
-    * Validates a JS object matches the Type. 
+    * Validates that a ProxyObject's value matches the Type. 
     * 
     * Note: Validation is not performed when setting
     * the Value since we want that to remain synchronous.

@@ -2,8 +2,7 @@ import { IMember, Member, MemberValue } from "../Member";
 import { IModel, ModelCreateParams } from '../Model'
 import { IStackContext } from "../stack/StackContext";
 import { IUidKeeper } from "../UidKeeper";
-
-export type VisitHandler<T> = (value: T, index: number, array: Array<T>) => void
+import { VisitHandler } from "./Handlers";
 
 export interface IMemberCollection {
    readonly model: IModel
@@ -14,6 +13,14 @@ export interface IMemberCollection {
    append(obj: ModelCreateParams): Promise<void>
    delete(name: string): Promise<void>
    find(predicate: VisitHandler<IMember>): IMember | undefined
+
+   /**
+    * Maps the Members into another structure
+    * 
+    * @param visit Handler used to transform each Field
+    */
+    map<T>(visit: VisitHandler<IMember>): void[]
+
    get(name: string): IMember | undefined
 }
 
@@ -84,7 +91,11 @@ export class MemberCollection implements IMemberCollection {
 
    find(predicate: VisitHandler<IMember>): IMember | undefined {
       return this.members.find(predicate)
-   } 
+   }
+
+   map<T>(visit: VisitHandler<IMember>): void[] {
+      return this.members.map(visit)
+   }
 
    get(name: string): IMember | undefined {
       return this.members.find(m => m.name === name)

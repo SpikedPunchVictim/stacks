@@ -2,7 +2,7 @@ import { IOrchestrator } from "../orchestrator/Orchestrator";
 import { ProxyObject } from "../ProxyObject";
 import { ValueSerializer } from "../serialize/ValueSerializer";
 import { IStackContext } from "../stack/StackContext";
-import { StackObject } from "../StackObject";
+import { isStackObject, StackObject } from "../StackObject";
 import { UidKeeper } from "../UidKeeper";
 import { IType, Type, TypeSet, ValidateResult } from "./Type";
 import { IValue, Value } from "./Value";
@@ -31,22 +31,12 @@ export class ObjectRefType extends Type {
    }
 
    async validate<T>(obj: T): Promise<ValidateResult> {
-      if(typeof obj !== 'string') {
-         return { success: false, error: new Error(`Type does not match. Expected 'string' for id and receieved '${typeof obj}'`)}
+      if(typeof obj !== 'object') {
+         return { success: false, error: new Error(`Type does not match. Expected 'object' for a reference type but receieved '${typeof obj}'`)}
       }
 
-      let id = obj as string
-
-      let model = this.context.cache.getModel(this.modelName)
-
-      if(model === undefined) {
-         return { success: false, error: new Error(`No Model exists with the name ${this.modelName}.`) }
-      }
-
-      let found = await this.orchestrator.getObject(model, id)
-
-      if(found === undefined) {
-         return { success: false, error: new Error(`The Object referenced (id: ${id}) doesn't exist`)}
+      if(!isStackObject(obj)) {
+         return { success: false, error: new Error(`The Object is expected to be a StackObject.`)}
       }
 
       return { success: true }

@@ -1,3 +1,4 @@
+export { CreateObjectEvent } from './CreateObjectEvent'
 export { DeleteObjectEvent } from './DeleteObjectEvent'
 export { IEvent } from './Event'
 export { IEventRouter, EventHandler } from './EventRouter'

@@ -60,11 +60,15 @@ export interface IModel {
      */
     get<T extends StackObject>(id: string): Promise<T | undefined>;
     /**
+     * Gets all Objects based on a Model
+     */
+    getAll<T extends StackObject>(): Promise<T[]>;
+    /**
      * Gets many Objects
      *
      * @param req The PagedRequest
      */
-    getMany<T>(req?: PageRequest): Promise<PageResponse<T>>;
+    getMany<T extends StackObject>(req?: PageRequest): Promise<PageResponse<T>>;
     /**
      * Converts the Model into a JS object
      */
@@ -86,10 +90,11 @@ export declare class Model implements IModel {
     constructor(name: string, id: string, context: IStackContext);
     append(obj: ModelCreateParams): Promise<void>;
     save<T extends StackObject>(obj: T): Promise<void>;
-    create<T extends StackObject>(obj?: ObjectCreateParams): Promise<T>;
+    create<T extends StackObject>(params?: ObjectCreateParams): Promise<T>;
     delete<T extends StackObject>(object: T): Promise<void>;
     get<T extends StackObject>(id: string): Promise<T | undefined>;
-    getMany<T>(req?: PageRequest): Promise<PageResponse<T>>;
+    getAll<T extends StackObject>(): Promise<T[]>;
+    getMany<T extends StackObject>(req?: PageRequest): Promise<PageResponse<T>>;
     toJs<T>(): Promise<T>;
     validate<T>(obj: T): Promise<ValidationReport>;
 }

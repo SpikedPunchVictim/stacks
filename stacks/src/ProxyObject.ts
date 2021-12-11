@@ -56,6 +56,7 @@ let handler = {
       if(property === 'id') {
          let cast = target as ProxyObject
          cast.internaleSetId(value)
+         return true
       }
 
       let field = target.fields.get(property)
@@ -66,6 +67,26 @@ let handler = {
 
       field.edit = value
       return true
+   },
+   ownKeys(target: IProxyObject): void[] {
+      return target.fields.map(f => f.name as string)
+   },
+   getOwnPropertyDescriptor(target: IProxyObject, key: string) {
+      let field = target.fields.get(key)
+
+      if(field === undefined) {
+         return {
+            configurable: false,
+            enumerable: false,
+            value: undefined
+         }
+      }
+
+      return {
+         configurable: true,
+         enumerable: true,
+         value: field.edit
+      }
    }
 }
 
@@ -124,6 +145,8 @@ export class ProxyObject implements IProxyObject {
       }
 
       let proxy = new ProxyObject(model, serialized.id, fields)
+
+      //@ts-ignore
       return new Proxy<IProxyObject>(proxy, handler)
    }
 

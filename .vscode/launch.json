@@ -38,6 +38,9 @@
          "cwd": "${workspaceRoot}",
          "protocol": "inspector",
          "smartStep": true,
+         "env": {
+            "TS_NODE_PROJECT": "${workspaceRoot}/tsconfig.json"
+         }
          "skipFiles": [
             "<node_internals>/**",
             "node_modules/**"
@@ -62,7 +65,7 @@
          "request": "launch",
          "runtimeArgs": [
             "--inspect-brk",
-            "${workspaceRoot}/node_modules/.bin/jest",
+            "${workspaceRoot}/stacks/node_modules/.bin/jest",
             "--runInBand"
          ],
          "console": "integratedTerminal",

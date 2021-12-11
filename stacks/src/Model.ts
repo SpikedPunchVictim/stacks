@@ -5,7 +5,6 @@ import { ValidationReport } from "./values/Type";
 import { CreateValueHandler, ValueCreateParams } from "./values/ValueSource";
 import { StackObject } from "./StackObject";
 import { IValueSerializer } from "./serialize/ValueSerializer";
-import { ProxyObject } from "./ProxyObject";
 import { MemberInfo } from "./Member";
 
 /**
@@ -76,11 +75,16 @@ export interface IModel {
    get<T extends StackObject>(id: string): Promise<T | undefined>
 
    /**
+    * Gets all Objects based on a Model
+    */
+   getAll<T extends StackObject>(): Promise<T[]>
+
+   /**
     * Gets many Objects
     * 
     * @param req The PagedRequest 
     */
-   getMany<T>(req?: PageRequest): Promise<PageResponse<T>>
+   getMany<T extends StackObject>(req?: PageRequest): Promise<PageResponse<T>>
 
    /**
     * Converts the Model into a JS object
@@ -126,8 +130,8 @@ export class Model implements IModel {
       await this.orchestrator.saveObject<T>(this, obj)
    }
 
-   async create<T extends StackObject>(obj: ObjectCreateParams = {}): Promise<T> {
-      return await ProxyObject.fromCreated<T>(this, obj, this.context) as T
+   async create<T extends StackObject>(params: ObjectCreateParams = {}): Promise<T> {
+      return await this.orchestrator.createObject(this, params)
    }
 
    async delete<T extends StackObject>(object: T): Promise<void> {
@@ -138,8 +142,21 @@ export class Model implements IModel {
       return await this.orchestrator.getObject<T>(this, id)
    }
 
-   async getMany<T>(req?: PageRequest): Promise<PageResponse<T>> {
-      return this.getMany<T>(req)
+   async getAll<T extends StackObject>(): Promise<T[]> {
+      let cursor = ''
+      let results = new Array<T>()
+      
+      do {
+         let paged = await this.orchestrator.getManyObjects<T>(this, { cursor })
+         results.push(...paged.items)
+         cursor = paged.cursor
+      } while(cursor !== '')
+
+      return results
+   }
+
+   async getMany<T extends StackObject>(req: PageRequest = {}): Promise<PageResponse<T>> {
+      return this.orchestrator.getManyObjects<T>(this, req)
    }
 
    async toJs<T>(): Promise<T> {
@@ -162,7 +179,7 @@ export class Model implements IModel {
          let member = this.members.get(key)
 
          if (member === undefined) {
-            report.addError(new Error(`Object contains a key that does not exist int he Model: ${key}`))
+            report.addError(new Error(`Object contains a key that does not exist in the Model: ${key}`))
             continue
          }
 

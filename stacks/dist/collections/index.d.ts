@@ -1,2 +1,3 @@
 export { FieldSwitchHandler, IFieldCollection } from './FieldCollection';
-export { IMemberCollection, VisitHandler } from './MemberCollection';
+export { IMemberCollection } from './MemberCollection';
+export { VisitHandler } from './Handlers';

@@ -1,9 +1,10 @@
+import { TypeSet } from ".";
 import { IModel } from "../Model";
 import { IStackContext } from "../stack/StackContext";
 import { UidKeeper } from "../UidKeeper";
 import { BoolValue } from "./Bool";
 import { IntValue } from "./Int";
-import { ListValue } from "./List";
+import { ListType, ListValue } from "./List";
 import { ObjectRefValue } from "./ObjectRef";
 import { StringValue } from "./String";
 import { IType } from "./Type";
@@ -68,10 +69,20 @@ export class ValueSource implements IValueSource {
       return new Proxy(values, handler)
    }
 
+   /**
+    * Resolves a set of ValueParams into a Value
+    * 
+    * @param source The ParamS
+    * @param context StackContext
+    * @param createContext Creation context if available
+    * @param coercedType IF the type is known ahead of time, this can help determine the Type mopre accurately
+    * @returns 
+    */
    static resolve(
       source: ValueCreateParams,
       context: IStackContext,
-      createContext?: ValueCreateContext
+      createContext?: ValueCreateContext,
+      coercedType?: IType
    ): IValue {
       let values = new ValueSource(context)
       let proxiedValues = ValueSource.toProxy(values)
@@ -91,7 +102,16 @@ export class ValueSource implements IValueSource {
             throw new Error(`Encountered an error when determining the Type of a value. Received an empty Array. Array notation can only be used if it contains at least 1 element.`)
          }
 
-         let firstType = cast[0].type
+         let coercedItemType: IType | undefined = undefined
+
+         if(coercedType !== undefined) {
+            if(coercedType.type == TypeSet.List) {
+               let list = coercedType as ListType
+               coercedItemType = list.itemType
+            }
+         }
+
+         let firstType = coercedItemType || cast[0].type
 
          let allTypesEqual = cast.every(it => firstType.equals(it.type))
 
@@ -110,7 +130,18 @@ export class ValueSource implements IValueSource {
             throw new Error(`Error resolving a Value. At least one item must be present in the Array to determine the List ItemType when resolving ${source}.`)
          }
 
-         let itemType = TypeSource.resolve(array[0], context)
+         let coercedItemType: IType | undefined = undefined
+
+         if(coercedType !== undefined) {
+            if(coercedType.type == TypeSet.List) {
+               let list = coercedType as ListType
+               coercedItemType = list.itemType
+            }
+         }
+
+         let itemType = coercedItemType === undefined ?
+            TypeSource.resolve(array[0], context) :
+            coercedItemType
          
          let list = new ListValue(itemType, context.serializer)
          list.push(...array.map(it => ValueSource.resolve(it, context)))

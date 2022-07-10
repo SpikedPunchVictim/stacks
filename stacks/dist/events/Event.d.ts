@@ -1,11 +1,16 @@
 export declare enum EventSet {
+    Bootstrap = "bootstrap",
     GetManyObjects = "get-many-objects",
+    GetModel = "get-model",
     GetObject = "get-object",
     HasId = "has-id",
+    ModelCreated = "model-created",
+    ModelDeleted = "model-deleted",
+    ModelUpdated = "model-updated",
     ObjectCreated = "object-created",
     ObjectDeleted = "object-deleted",
     ObjectUpdated = "object-updated",
-    SaveObject = "commit-object"
+    ObjectSaved = "object-saved"
 }
 export declare enum EventState {
     Raised = "raised",

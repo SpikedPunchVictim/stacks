@@ -1,13 +1,43 @@
 import { StackObject } from "../StackObject";
 import { ICache } from "../Cache";
 import { IRequestForChangeSource } from "../events/RequestForChange";
-import { IModel, ObjectCreateParams, PageRequest, PageResponse } from "../Model";
+import { IModel, ModelCreateParams, ObjectCreateParams, PageRequest, PageResponse } from "../Model";
 import { IStack } from "../stack/Stack";
 import { IStackContext } from "../stack/StackContext";
 import { UpdateObjectHandler } from "../stack/StackUpdate";
 import { IUidKeeper } from "../UidKeeper";
 import { IValueSerializer } from "../serialize/ValueSerializer";
 export interface IOrchestrator {
+    /**
+     * Bootstraps the Stack.
+     */
+    boostrap(): Promise<void>;
+    /**
+     * Creates a Model
+     *
+     * @param name The name of the Model
+     * @param params The Params used to create the Model
+     */
+    createModel(name: string, params: ModelCreateParams): Promise<IModel>;
+    /**
+     * Deletes a Model
+     *
+     * @param model The Model to delete
+     */
+    deleteModel(model: IModel): Promise<void>;
+    /**
+     * Retrieves a Model if it exists, or undefiend if not.
+     *
+     * @param name The Model name
+     */
+    getModel(name: string): Promise<IModel | undefined>;
+    /**
+     * Updates an existing Model
+     *
+     * @param model The Model to update
+     * @param params The Params
+     */
+    updateModel(model: IModel, params: ModelCreateParams): Promise<void>;
     /**
      * Creates a new Object in memory only. Not indended to be stored on the backend.
      * Objects created this way have no ID assigned to them until they are saved.
@@ -67,6 +97,11 @@ export declare class Orchestrator implements IOrchestrator {
     get stack(): IStack;
     get uid(): IUidKeeper;
     constructor(context: IStackContext);
+    boostrap(): Promise<void>;
+    createModel(name: string, params: ModelCreateParams): Promise<IModel>;
+    deleteModel(model: IModel): Promise<void>;
+    getModel(name: string): Promise<IModel | undefined>;
+    updateModel(model: IModel, params: ModelCreateParams): Promise<void>;
     createObject<T extends StackObject>(model: IModel, params: ObjectCreateParams): Promise<T>;
     /**
      *

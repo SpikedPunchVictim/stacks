@@ -51,7 +51,7 @@ let tests: EventTest[] = [
       }
    },
    {
-      event: EventSet.SaveObject,
+      event: EventSet.ObjectSaved,
       run: async ({ model, objects }) => {
          await model.save(objects[0])
       }

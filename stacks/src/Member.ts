@@ -100,7 +100,7 @@ export class Member implements IMember {
 
             let subResolve: Exclude<MemberValue, MemberInfo> = value.value as Exclude<MemberValue, MemberInfo>
 
-            let resolvedValue = ValueSource.resolve(subResolve, context, createContext)
+            let resolvedValue = ValueSource.resolve(subResolve, context, createContext, type)
             let symbols = value.symbols || new Array<SymbolEntry>()
 
             if(!type.equals(resolvedValue.type)) {

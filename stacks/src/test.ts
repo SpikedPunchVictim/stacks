@@ -36,12 +36,15 @@ async function main(): Promise<void> {
       string: 'Oh man!'
    })
 
-   let ggs = []
-   for(let i = 0; i < 1000; ++i) {
-      ggs.push(await GG.create())
+   let ggs = new Array<StackObject>()
+
+   for(let i = 0; i < 99; ++i) {
+      let created = await GG.create()
+      await GG.save(created)
+      ggs.push(created)
    }
 
-   let paged = await GG.getMany()
+   let paged = await GG.getAll()
 
    console.dir(paged)
 

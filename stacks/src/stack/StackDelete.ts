@@ -1,5 +1,6 @@
 import { StackObject } from "..";
 import { ICache } from "../Cache";
+import { IOrchestrator } from "../orchestrator/Orchestrator";
 
 export interface IStackDelete {
    /**
@@ -18,12 +19,18 @@ export interface IStackDelete {
 }
 
 export class StackDelete implements IStackDelete {
-   constructor(readonly cache: ICache) {
+   constructor(readonly cache: ICache, readonly orchestrator: IOrchestrator) {
 
    }
 
    async model(name: string): Promise<void> {
-      this.cache.deleteModel(name)
+      let model = this.cache.getModel(name)
+
+      if(model === undefined) {
+         return
+      }
+
+      return this.orchestrator.deleteModel(model)
    }
    
    async object<T extends StackObject>(modelName: string, object: T): Promise<void> {
@@ -33,6 +40,6 @@ export class StackDelete implements IStackDelete {
          return
       }
 
-      this.cache.deleteObject(model, object)
+      await model.delete(object)
    }
 }

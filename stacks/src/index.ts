@@ -1,4 +1,4 @@
-export { IStack, Stack } from "./stack/Stack";
+export { IPlugin, IStack, Stack } from "./stack"
 export { IProxyObject as ISerializedObject } from './ProxyObject'
 export { IField } from './Field'
 export { IMember, MemberInfo } from './Member'

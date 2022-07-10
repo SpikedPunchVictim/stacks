@@ -1,8 +1,10 @@
+export { BootstrapEvent } from './BootstrapEvent';
 export { CreateObjectEvent } from './CreateObjectEvent';
 export { DeleteObjectEvent } from './DeleteObjectEvent';
-export { IEvent } from './Event';
+export { IEvent, EventSet, ExistState } from './Event';
 export { IEventRouter, EventHandler } from './EventRouter';
 export { GetManyObjectsEvent } from './GetManyObjectsEvent';
+export { GetModelEvent } from './GetModelEvent';
 export { GetObjectEvent } from './GetObjectEvent';
 export { HasIdEvent } from './HasIdEvent';
 export { SaveObjectEvent } from './SaveObjectEvent';

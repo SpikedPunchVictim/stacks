@@ -25,6 +25,11 @@ import { ValueCreateParams, ValueSource } from "./values/ValueSource";
 export interface IProxyObject {
    readonly id: string
    readonly fields: IFieldCollection
+
+   /**
+    * Converts the Proxy Object into a Javascript Object
+    */
+   toJs<T extends StackObject>(): T
 }
 
 let handler = {
@@ -46,7 +51,7 @@ let handler = {
          // Returning undefined here to not only get around
          // not having the property, but also in the cases
          // when the Proxy is await'd, the underlying system
-         // calls then() until an undefiend is returned.
+         // calls then() until an undefined is returned.
          return undefined
       }
 
@@ -118,6 +123,15 @@ export class ProxyObject implements IProxyObject {
       return new Proxy<IProxyObject>(proxy, handler)
    }
 
+   /**
+    * This converts a Serialized Object (typically from the data store), and converts
+    * it into a ProxyObject that the caller can interact with.
+    * 
+    * @param model The Model
+    * @param serialized Raw serialized data that has been stored
+    * @param serializer The Serializer used to deserialized the serialized raw data
+    * @returns ProxyObject
+    */
    static async fromStored(model: IModel, serialized: any, serializer: IValueSerializer): Promise<IProxyObject> {
       /*
          Bool -> true
@@ -150,6 +164,14 @@ export class ProxyObject implements IProxyObject {
       return new Proxy<IProxyObject>(proxy, handler)
    }
 
+   /**
+    * Creates a Proxy Object when an Object is being created in-memory (before being saved)
+    * 
+    * @param model The Model
+    * @param obj The object being created
+    * @param context The StackContext
+    * @returns 
+    */
    static async fromCreated<T extends StackObject>(model: IModel, obj: ObjectCreateParams, context: IStackContext): Promise<T> {
       let fields = new Array<IField>()
 
@@ -198,6 +220,16 @@ export class ProxyObject implements IProxyObject {
    static unwrap(serialized: IProxyObject): IProxyObject {
       //@ts-ignore
       return serialized._unwrap()
+   }
+
+   toJs<T extends StackObject>(): T {
+      let result = {}
+
+      for(let field of this.fields) {
+         result[field.name] = field.edit
+      }
+
+      return result as T
    }
 
    private static async buildNestedEditObject(member: IMember, createValues: ValueCreateParams | ObjectCreateParams, context: IStackContext): Promise<any> {

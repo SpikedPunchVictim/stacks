@@ -1,6 +1,7 @@
 import { IModel } from "../Model";
+import { StackObject } from "../StackObject";
 import { Event, ExistState } from "./Event";
-export declare class GetObjectEvent<T> extends Event {
+export declare class GetObjectEvent<T extends StackObject> extends Event {
     readonly model: IModel;
     readonly id: string;
     /**

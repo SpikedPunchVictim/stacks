@@ -42,7 +42,16 @@ export declare class ValueSource implements IValueSource {
      * @returns A Proxy'd IValueSource
      */
     static toProxy(values: IValueSource): IValueSource;
-    static resolve(source: ValueCreateParams, context: IStackContext, createContext?: ValueCreateContext): IValue;
+    /**
+     * Resolves a set of ValuePArams into a Value
+     *
+     * @param source The ParamS
+     * @param context StackContext
+     * @param createContext Creation context if available
+     * @param coercedType IF the type is known ahead of time, this can help determine the Type mopre accurately
+     * @returns
+     */
+    static resolve(source: ValueCreateParams, context: IStackContext, createContext?: ValueCreateContext, coercedType?: IType): IValue;
     bool(value?: boolean): BoolValue;
     int(value?: number): IntValue;
     list(itemType: TypeCreateParams): ListValue;

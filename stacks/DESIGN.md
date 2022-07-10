@@ -1,0 +1,4 @@
+# Design Decisions
+
+* Objects that are created and not saved, do not have an ID assigned to them. This is to reduce the round trip time it would take to hit a DB/backend system. They are assigned a unique ID when they are saved.
+* GetMany will only return Objects that have been saved, not intermediary in-memory objects. In a high availability scenario, where multiple servers are running (each having their own in-memory state), having GetMany return the in-memory objects would return different values depending on what server was delivering the results. Objects aren't considered part of a system until they are saved. Also, since in-memory Objects don't have IDs associated with them yet, returning all of the in-memory Objects has little value.

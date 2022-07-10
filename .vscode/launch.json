@@ -5,22 +5,19 @@
    "version": "0.2.0",
    "configurations": [
       {
-         "version": "0.2.0",
-         "configurations": [
-            {
-               "name": "[stacks] Debug Tests",
-               "type": "node",
-               "request": "launch",
-               "runtimeArgs": [
-                  "--inspect-brk",
-                  "${workspaceRoot}/node_modules/.bin/jest",
-                  "--runInBand"
-               ],
-               "console": "integratedTerminal",
-               "internalConsoleOptions": "neverOpen",
-               "port": 9229
-            }
-         ]
+         "name": "[stacks] Debug Tests",
+         "type": "node",
+         "request": "launch",
+         "runtimeArgs": [
+            "--inspect-brk",
+            "${workspaceRoot}/stacks/node_modules/.bin/jest",
+            "--runInBand",
+            "--config",
+            "${workspaceRoot}/stacks/jest.config.ts"
+         ],
+         "console": "integratedTerminal",
+         "internalConsoleOptions": "neverOpen",
+         "port": 9229
       },
       {
          "name": "[stacks] TS | Current File",
@@ -39,38 +36,63 @@
          "protocol": "inspector",
          "smartStep": true,
          "env": {
-            "TS_NODE_PROJECT": "${workspaceRoot}/tsconfig.json"
-         }
+            "TS_NODE_PROJECT": "${workspaceRoot}/dev/tsconfig.json"
+         },
          "skipFiles": [
             "<node_internals>/**",
             "node_modules/**"
          ],
-      }
-      {
-         "type": "pwa-node",
-         "request": "launch",
-         "name": "Launch Program",
-         "skipFiles": [
-            "<node_internals>/**"
-         ],
-         "program": "${workspaceFolder}/dist/index.js",
-         "preLaunchTask": "tsc: build - tsconfig.json",
-         "outFiles": [
-            "${workspaceFolder}/dist/**/*.js"
-         ]
       },
       {
-         "name": "stacks | Debug Tests",
+         "name": "[stacks-rest] TS | Current File",
+         "type": "node",
+         "request": "launch",
+         "args": [
+            "${relativeFile}"
+         ],
+         "runtimeArgs": [
+            "--nolazy",
+            "-r",
+            "ts-node/register"
+         ],
+         "sourceMaps": true,
+         "cwd": "${workspaceRoot}",
+         "protocol": "inspector",
+         "smartStep": true,
+         "env": {
+            "TS_NODE_PROJECT": "${workspaceRoot}/stacks-rest/tsconfig.json"
+         },
+         "skipFiles": [
+            "<node_internals>/**",
+            "node_modules/**"
+         ],
+      },
+      {
+         "name": "[stacks-rest] Debug Tests",
          "type": "node",
          "request": "launch",
          "runtimeArgs": [
             "--inspect-brk",
-            "${workspaceRoot}/stacks/node_modules/.bin/jest",
-            "--runInBand"
+            "${workspaceRoot}/stacks-rest/node_modules/.bin/jest",
+            "--runInBand",
+            "--config",
+            "${workspaceRoot}/stacks-rest/jest.config.ts"
          ],
          "console": "integratedTerminal",
          "internalConsoleOptions": "neverOpen",
          "port": 9229
-      }
+      },
+      {
+         "name": "[stacks-fs] JS | Current File",
+         "type": "node",
+         "request": "launch",
+         "smartStep": true,
+         "skipFiles": [
+             "<node_internals>/**",
+             "node_modules/**"
+         ],
+         "program": "${workspaceFolder}/${relativeFile}",
+         "cwd": "${workspaceFolder}/stacks-fs"
+     }
    ]
 }

@@ -1,0 +1,30 @@
+{
+  "name": "@spikedpunch/stacks-dynamo",
+  "version": "0.0.1",
+  "description": "DynaoDB plugin for Stacks",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SpikedPunchVictim/stacks.git"
+  },
+  "keywords": [
+    "stacks",
+    "dynamodb",
+    "database",
+    "db",
+    "store",
+    "storage",
+    "aws",
+    "low",
+    "code"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SpikedPunchVictim/stacks/issues"
+  },
+  "homepage": "https://github.com/SpikedPunchVictim/stacks#readme"
+}

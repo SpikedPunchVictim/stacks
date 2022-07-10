@@ -1,7 +1,6 @@
 import { StackObject } from "..";
-import { ICache } from "../Cache";
-import { IModel, Model, ModelCreateParams, ObjectCreateParams } from "../Model";
-import { IUidKeeper } from "../UidKeeper";
+import { IModel, ModelCreateParams, ObjectCreateParams } from "../Model";
+import { IOrchestrator } from "../orchestrator/Orchestrator";
 import { IStackContext } from "./StackContext";
 import { IStackGet } from "./StackGet";
 
@@ -23,33 +22,16 @@ export interface IStackCreate {
 }
 
 export class StackCreate implements IStackCreate {
-   private get cache(): ICache {
-      return this.context.cache
-   }
-
-   private get uid(): IUidKeeper {
-      return this.context.uid
+   private get orchestrator(): IOrchestrator {
+      return this.context.orchestrator
    }
 
    constructor(readonly get: IStackGet, readonly context: IStackContext) {
 
    }
 
-   async model(name: string, obj: ModelCreateParams = {}): Promise<IModel> {
-      let model = await this.get.model(name)
-
-      if(model !== undefined) {
-         throw new Error(`A Model with the name ${name} already exists`)
-      }
-
-      let id = await this.uid.generate()
-
-      model = new Model(name, id, this.context)
-      await model.append(obj)
-
-      this.cache.saveModel(model)
-
-      return model
+   async model(name: string, params: ModelCreateParams = {}): Promise<IModel> {
+      return this.orchestrator.createModel(name, params)
    }
 
    async object<T extends StackObject>(modelName: string, obj: ObjectCreateParams): Promise<T> {

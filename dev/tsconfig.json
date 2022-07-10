@@ -5,6 +5,7 @@
        "target": "es2019",
        "module": "commonjs",
        "moduleResolution": "node",
+       "esModuleInterop": true,
        "downlevelIteration": true,
        "inlineSources": true,
        "inlineSourceMap": true,

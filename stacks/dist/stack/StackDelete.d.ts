@@ -1,5 +1,6 @@
 import { StackObject } from "..";
 import { ICache } from "../Cache";
+import { IOrchestrator } from "../orchestrator/Orchestrator";
 export interface IStackDelete {
     /**
      * Deletes a Model and all Objects associated with the Model
@@ -16,7 +17,8 @@ export interface IStackDelete {
 }
 export declare class StackDelete implements IStackDelete {
     readonly cache: ICache;
-    constructor(cache: ICache);
+    readonly orchestrator: IOrchestrator;
+    constructor(cache: ICache, orchestrator: IOrchestrator);
     model(name: string): Promise<void>;
     object<T extends StackObject>(modelName: string, object: T): Promise<void>;
 }

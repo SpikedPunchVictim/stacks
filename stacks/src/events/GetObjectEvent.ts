@@ -1,7 +1,8 @@
 import { IModel } from "../Model";
+import { StackObject } from "../StackObject";
 import { Event, EventSet, ExistState } from "./Event";
 
-export class GetObjectEvent<T> extends Event {
+export class GetObjectEvent<T extends StackObject> extends Event {
    /**
     * The serialized version of the Object
     */

@@ -20,9 +20,8 @@ export interface IStackCreate {
 export declare class StackCreate implements IStackCreate {
     readonly get: IStackGet;
     readonly context: IStackContext;
-    private get cache();
-    private get uid();
+    private get orchestrator();
     constructor(get: IStackGet, context: IStackContext);
-    model(name: string, obj?: ModelCreateParams): Promise<IModel>;
+    model(name: string, params?: ModelCreateParams): Promise<IModel>;
     object<T extends StackObject>(modelName: string, obj: ObjectCreateParams): Promise<T>;
 }

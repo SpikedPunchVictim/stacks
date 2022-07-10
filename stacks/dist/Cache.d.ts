@@ -2,6 +2,10 @@ import { StackObject } from "./StackObject";
 import { IModel } from "./Model";
 export interface ICache {
     /**
+     * Gets a list of defined Models
+     */
+    readonly models: IModel[];
+    /**
      * Deletes a Model from the cache
      *
      * @param name The Model's name
@@ -60,11 +64,12 @@ export interface ICache {
     getObjects<T extends StackObject>(model: IModel): T[];
 }
 export declare class Cache implements ICache {
+    get models(): IModel[];
     /**
      * Key: Model name
      * Value: Model
      */
-    private models;
+    private modelMap;
     /**
      * Key: Model Name
      * Value: Object

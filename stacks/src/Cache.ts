@@ -5,6 +5,11 @@ import { UidKeeper } from "./UidKeeper";
 
 export interface ICache {
    /**
+    * Gets a list of defined Models
+    */
+   readonly models: IModel[]
+
+   /**
     * Deletes a Model from the cache
     * 
     * @param name The Model's name
@@ -72,11 +77,22 @@ export interface ICache {
 }
 
 export class Cache implements ICache {
+   get models(): IModel[] {
+      let results = new Array<IModel>()
+
+      for(let model of this.modelMap.values()) {
+         results.push(model)
+      }
+      
+      return results
+   }
+
+
    /**
     * Key: Model name
     * Value: Model
     */
-   private models: Map<string, IModel> = new Map<string, IModel>()
+   private modelMap: Map<string, IModel> = new Map<string, IModel>()
 
    /**
     * Key: Model Name
@@ -89,15 +105,15 @@ export class Cache implements ICache {
    }
 
    deleteModel(name: string): void {
-      this.models.delete(name)
+      this.modelMap.delete(name)
    }
 
    getModel(name: string): IModel | undefined {
-      return this.models.get(name)
+      return this.modelMap.get(name)
    }
 
    getModelById(id: string): IModel | undefined {
-      for(let model of this.models.values()) {
+      for(let model of this.modelMap.values()) {
          if(model.id === id) {
             return model
          }
@@ -125,7 +141,7 @@ export class Cache implements ICache {
    }
 
    saveModel(model: IModel): void {
-      this.models.set(model.name, model)
+      this.modelMap.set(model.name, model)
    }
    
    saveObject<T extends StackObject>(model: IModel, obj: T): void {

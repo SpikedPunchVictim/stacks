@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UpdateModelEvent = void 0;
+const Event_1 = require("./Event");
+class UpdateModelEvent extends Event_1.Event {
+    constructor(model) {
+        super(Event_1.EventSet.ModelUpdated);
+        this.model = model;
+    }
+}
+exports.UpdateModelEvent = UpdateModelEvent;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiVXBkYXRlTW9kZWxFdmVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9ldmVudHMvVXBkYXRlTW9kZWxFdmVudC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFDQSxtQ0FBMEM7QUFHMUMsTUFBYSxnQkFBaUIsU0FBUSxhQUFLO0lBQ3hDLFlBQXFCLEtBQWE7UUFDL0IsS0FBSyxDQUFDLGdCQUFRLENBQUMsWUFBWSxDQUFDLENBQUE7UUFEVixVQUFLLEdBQUwsS0FBSyxDQUFRO0lBRWxDLENBQUM7Q0FDSDtBQUpELDRDQUlDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgSU1vZGVsIH0gZnJvbSBcIi4uL01vZGVsXCI7XG5pbXBvcnQgeyBFdmVudCwgRXZlbnRTZXQgfSBmcm9tIFwiLi9FdmVudFwiO1xuXG5cbmV4cG9ydCBjbGFzcyBVcGRhdGVNb2RlbEV2ZW50IGV4dGVuZHMgRXZlbnQge1xuICAgY29uc3RydWN0b3IocmVhZG9ubHkgbW9kZWw6IElNb2RlbCkge1xuICAgICAgc3VwZXIoRXZlbnRTZXQuTW9kZWxVcGRhdGVkKVxuICAgfVxufSJdfQ==

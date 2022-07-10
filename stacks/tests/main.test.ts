@@ -1,4 +1,4 @@
-import { IModel, IValueSource, Stack, StackObject } from '../src'
+import { IModel, IStack, IValueSource, MemberInfo, Stack, StackObject } from '../src'
 import { UidKeeper } from '../src/UidKeeper'
 import { createScenario, validateModel, validateObject } from './Utils'
 
@@ -143,16 +143,32 @@ describe(`# Models`, () => {
       await validateObject(obj, newObj)
    })
 
+   test(`Can change a Member's Type`, async () => {
+      let stack = Stack.create()
 
+      let model = await stack.create.model('user', {
+         name: 'rick',
+         age: ({ uint }) => uint(69),
+         bool: true
+      })
 
+      await model.members.add('name', ({ string }) => string('john'))
 
+      await validateModel(model, {
+         name: 'john',
+         age: 69,
+         bool: true
+      }, stack.serializer)
 
+      let didThrow = false
+      try {
+         await model.members.add('name', ({ int }) => int(3))
+      } catch(err) {
+         didThrow = true
+      }
 
-
-
-
-
-
+      expect(didThrow).toBe(false)
+   })
 
    // TODO: Test every type
    // test(`toJs() returns the right values`, async () => {
@@ -208,32 +224,7 @@ describe(`# Models`, () => {
    //    })
    // })
 
-   // test(`Cannot add member with the same name and different Type`, async () => {
-   //    let stack = Stack.create()
 
-   //    let model = await stack.create.model('user', {
-   //       name: 'rick',
-   //       age: ({ uint }) => uint(69),
-   //       bool: true
-   //    })
-
-   //    await model.members.add('name', ({ string }) => string('john'))
-
-   //    await validateModel(model, {
-   //       name: 'john',
-   //       age: 69,
-   //       bool: true
-   //    })
-
-   //    let didThrow = false
-   //    try {
-   //       await model.members.add('name', ({ int }) => int(3))
-   //    } catch(err) {
-   //       didThrow = true
-   //    }
-
-   //    expect(didThrow).toBe(true)
-   // })
 
    // test(`Appending Member with the same name changes the original value`, async () => {
    //    let stack = Stack.create()
@@ -273,8 +264,94 @@ describe(`# Models`, () => {
       * getMany()
       * * Local objects that are created do not have their IDs set
       * All Values can be cloned()
+      * Tests for setting refs in Models
    */
 
+})
+
+type TypeTest = {
+   name: string,
+   info: MemberInfo,
+   test: (stack: IStack, model: IModel) => Promise<void>
+}
+
+describe(`# Models (Types)`, () => {
+   const BasicTypeTests: TypeTest[] = [
+      {
+         name: 'bool',
+         info: {
+            type: ({ bool }) => bool,
+            value: ({ bool }) => bool(true)
+         },
+         test: async (stack, model) => await validateModel(model, { test: true }, stack.serializer)
+      },
+      {
+         name: 'int',
+         info: {
+            type: ({ int }) => int,
+            value: ({ int }) => int(-10)
+         },
+         test: async (stack, model) => await validateModel(model, { test: -10 }, stack.serializer)
+      },
+      {
+         name: 'uint',
+         info: {
+            type: ({ uint }) => uint,
+            value: ({ uint }) => uint(10)
+         },
+         test: async (stack, model) => await validateModel(model, { test: 10 }, stack.serializer)
+      },
+      {
+         name: 'string',
+         info: {
+            type: ({ string }) => string,
+            value: ({ string }) => string('a little scary')
+         },
+         test: async (stack, model) => await validateModel(model, { test: 'a little scary' }, stack.serializer)
+      },
+      {
+         name: 'list<bool>',
+         info: {
+            type: (types) => types.list(types.bool),
+            value: [true, false, true]
+         },
+         test: async (stack, model) => await validateModel(model, { test: [true, false, true] }, stack.serializer)
+      },
+      {
+         name: 'list<int>',
+         info: {
+            type: (types) => types.list(types.int),
+            value: [1, 2, -3]
+         },
+         test: async (stack, model) => await validateModel(model, { test: [1, 2, -3] }, stack.serializer)
+      },
+      {
+         name: 'list<uint>',
+         info: {
+            type: (types) => types.list(types.uint),
+            value: [1, 2, 3]
+         },
+         test: async (stack, model) => await validateModel(model, { test: [1, 2, 3] }, stack.serializer)
+      },
+      {
+         name: 'list<string>',
+         info: {
+            type: (types) => types.list(types.string),
+            value: ['the', 'quick', 'fox']
+         },
+         test: async (stack, model) => await validateModel(model, { test: ['the', 'quick', 'fox'] }, stack.serializer)
+      }
+   ]
+
+   for(let info of BasicTypeTests) {
+      test(`Can set a ${info.name}`, async () => {
+         let stack = Stack.create()
+         let model = await stack.create.model('test')
+   
+         await model.append({ test: info.info })
+         await info.test(stack, model)
+      })
+   }
 })
 
 describe(`# Objects`, () => {

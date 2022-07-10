@@ -8,7 +8,7 @@ type MonitorStatus = {
 }
 
 export interface IEventRouter {
-   on<T extends IEvent>(type: string, handler: EventHandler<T>): void
+   on<T extends IEvent>(type: EventSet, handler: EventHandler<T>): void
    raise(action: IEvent): Promise<void>
 }
 

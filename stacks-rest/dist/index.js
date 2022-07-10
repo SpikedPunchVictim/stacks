@@ -1,0 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StacksRest = void 0;
+var Rest_1 = require("./Rest");
+Object.defineProperty(exports, "StacksRest", { enumerable: true, get: function () { return Rest_1.StacksRest; } });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBQUEsK0JBVWU7QUFEWixrR0FBQSxVQUFVLE9BQUEiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQge1xuICAgRGVsZXRlUmVxdWVzdE9wdGlvbnMsXG4gICBHZXRSZXF1ZXN0T3B0aW9ucyxcbiAgIElSZXN0TWlkZGxld2FyZSxcbiAgIExpc3RlbkhhbmRsZXIsXG4gICBQb3N0UmVxdWVzdE9wdGlvbnMsXG4gICBQdXRSZXF1ZXN0T3B0aW9ucyxcbiAgIFJlcXVlc3RIYW5kbGVyLFxuICAgUmVzdENvbnRleHQsXG4gICBTdGFja3NSZXN0XG59IGZyb20gJy4vUmVzdCdcblxuZXhwb3J0e1xuICAgUmVzdEVycm9yUmVzcG9uc2UsXG4gICBSZXN0UmVzcG9uc2VEZXRhaWxlZCxcbiAgIFJlc3RSZXNwb25zZU1pbmltYWwsXG4gICBSZXN0U3VjY2Vzc1Jlc3BvbnNlXG59IGZyb20gJy4vUmVzcG9uc2UnIl19

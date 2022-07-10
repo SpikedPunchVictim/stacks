@@ -8,7 +8,7 @@ import { GetManyObjectsEvent } from "../events/GetManyObjectsEvent";
 import { HasIdEvent } from "../events/HasIdEvent";
 import { IRequestForChangeSource } from "../events/RequestForChange";
 import { UpdateObjectEvent } from "../events/UpdateObjectEvent";
-import { IModel, ObjectCreateParams, PageRequest, PageResponse } from "../Model";
+import { IModel, Model, ModelCreateParams, ObjectCreateParams, PageRequest, PageResponse } from "../Model";
 import { IStack } from "../stack/Stack";
 import { IStackContext } from "../stack/StackContext";
 import { UpdateObjectHandler } from "../stack/StackUpdate";
@@ -16,9 +16,48 @@ import { ProxyObject } from "../ProxyObject";
 import { IUidKeeper, UidKeeper } from "../UidKeeper";
 import { IValueSerializer } from "../serialize/ValueSerializer";
 import { CreateObjectEvent } from "../events/CreateObjectEvent";
+import { CreateModelEvent } from "../events/CreateModelEvent";
+import { DeleteModelEvent } from "../events/DeleteModelEvent";
+import { GetModelEvent } from "../events/GetModelEvent";
+import { BootstrapEvent } from "../events/BootstrapEvent";
 
 export interface IOrchestrator {
    // TODO: Add: createModel, deleteModel (these should assist in running tests)
+
+   /**
+    * Bootstraps the Stack.
+    */
+   boostrap(): Promise<void>
+
+   /**
+    * Creates a Model
+    * 
+    * @param name The name of the Model
+    * @param params The Params used to create the Model
+    */
+   createModel(name: string, params: ModelCreateParams): Promise<IModel>
+
+   /**
+    * Deletes a Model
+    * 
+    * @param model The Model to delete
+    */
+   deleteModel(model: IModel): Promise<void>
+
+   /**
+    * Retrieves a Model if it exists, or undefiend if not.
+    * 
+    * @param name The Model name
+    */
+   getModel(name: string): Promise<IModel | undefined>
+
+   /**
+    * Updates an existing Model
+    * 
+    * @param model The Model to update
+    * @param params The Params
+    */
+   updateModel(model: IModel, params: ModelCreateParams): Promise<void>
 
    /**
     * Creates a new Object in memory only. Not indended to be stored on the backend.
@@ -104,6 +143,72 @@ export class Orchestrator implements IOrchestrator {
 
    }
 
+   async boostrap(): Promise<void> {
+      await this.rfc.create(new BootstrapEvent())
+         .fulfill(async (event) => {
+            await this.stack.emit(EventSet.Bootstrap, event)
+         })
+         .commit()
+   }
+
+   async createModel(name: string, params: ModelCreateParams): Promise<IModel> {
+      let model = await this.stack.get.model(name)
+
+      if(model !== undefined) {
+         throw new Error(`A Model with the name ${name} already exists`)
+      }
+
+      let id = await this.uid.generate()
+
+      model = new Model(name, id, this.context)
+      await model.append(params)
+
+      this.cache.saveModel(model)
+
+      await this.rfc.create(new CreateModelEvent(model))
+         .fulfill(async (event) => {
+            await this.stack.emit(EventSet.ModelCreated, event)
+         })
+         .commit()
+
+      return model
+   }
+
+   async deleteModel(model: IModel): Promise<void> {
+      await this.rfc.create(new DeleteModelEvent(model))
+         .fulfill( async (event) => {
+            this.cache.deleteModel(model.name)
+         })
+         .commit()
+   }
+
+   // Note: This may not be needed. Watch for this.
+   // Model's are stored in local cache because they are
+   // defined locally, and are the contract between the
+   // the expected data set and what is stored.
+   async getModel(name: string): Promise<IModel | undefined> {
+      let model: IModel | undefined
+
+      await this.rfc.create(new GetModelEvent(name))
+         .fulfill(async (event) => {
+            let getModel = event as GetModelEvent
+            model = getModel.model
+
+            if(model !== undefined) {
+               this.cache.saveModel(model)
+            }
+
+            await this.stack.emit(EventSet.GetModel, event)
+         })
+         .commit()
+
+      return model
+   }
+
+   async updateModel(model: IModel, params: ModelCreateParams): Promise<void> {
+
+   }
+
    async createObject<T extends StackObject>(model: IModel, params: ObjectCreateParams): Promise<T> {
       let created = await ProxyObject.fromCreated<T>(model, params, this.context) as T
 
@@ -138,12 +243,12 @@ export class Orchestrator implements IOrchestrator {
       await this.rfc.create(new SaveObjectEvent<T>(model, obj, serialized))
          .fulfill(async (event) => {
             this.cache.saveObject(model, obj)
-            await this.stack.emit(EventSet.SaveObject, event)
+            await this.stack.emit(EventSet.ObjectSaved, event)
          })
          .commit()
    }
 
-   async getManyObjects<T extends StackObject>(model: IModel, options: PageRequest = {}): Promise<PageResponse<T>> {
+   async getManyObjects<T extends StackObject>(model: IModel, options: PageRequest = { cursor: '', limit: 100 }): Promise<PageResponse<T>> {
       let results = {
          cursor: '',
          items: new Array<T>()

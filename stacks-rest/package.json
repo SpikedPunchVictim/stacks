@@ -1,0 +1,38 @@
+{
+  "name": "@spikedpunch/stacks-rest",
+  "version": "0.0.1",
+  "description": "Expose your Stack objects over REST",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "stacks",
+    "REST",
+    "low",
+    "code",
+    "data",
+    "modeling"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "~4.5.3",
+    "ts-node": "~10.4.0",
+    "ts-jest": "~27.1.1",
+    "rimraf": "~3.0.2",
+    "jest": "~27.4.4",
+    "@types/node": "~16.11.12",
+    "@types/jest": "~27.0.3"
+  },
+  "dependencies": {
+    "koa": "~2.13.4",
+    "koa-bodyparser": "~4.3.0",
+    "@types/koa": "~2.13.4",
+    "@types/koa-bodyparser": "~4.3.4",
+    "@koa/router": "~10.1.1",
+    "axios": "~0.24.0",
+    "@spikedpunch/stacks": "~0.0.1"
+  }
+}

@@ -1,11 +1,15 @@
 const path = require('path')
 const { FsPlugin } = require('./dist')
 const { Stack } = require('@spikedpunch/stacks')
+const fs = require('fs-extra')
+
+const StoreDir = path.join(__dirname, 'store')
 
 async function main() {
+   await fs.remove(StoreDir)
    let stack = Stack.create()
 
-   await stack.use(new FsPlugin(path.join(__dirname, 'store')))
+   await stack.use(new FsPlugin(StoreDir))
 
    let Race = await stack.create.model('race', {
       name: ''
@@ -54,16 +58,16 @@ async function main() {
    await Sword.save(iceSword)
    await Sword.save(fireSword)
 
-   let count = 1000
+   let count = 3
 
    for(let i = 0; i < count; ++i) {
       let sword = await Sword.create({
-         name: `${count}`,
+         name: `${i}`,
          price: 250,
          used: true,
          lore: {
-            user: `auto-${count}`,
-            description: `auto created ${count}`
+            user: `auto-${i}`,
+            description: `auto created ${i}`
          }
       })
 
@@ -71,7 +75,18 @@ async function main() {
    }
 
    let swords = await Sword.getAll()
-   console.log(swords.map(s => s.name))
+   console.log(swords.length)
+   
+   await Sword.delete(iceSword)
+
+   swords = await Sword.getAll()
+   console.log(swords.length)
+
+   fireSword.price = 6969
+   await stack.update.object(Sword, fireSword, async (updated, exists) => {
+      console.log(`\n:: Updated ( ${exists})`)
+      console.dir(updated)
+   })
 }
 
 main()

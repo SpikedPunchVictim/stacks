@@ -17,6 +17,8 @@ import {
 
 import * as fs from 'fs-extra'
 
+const TempFileExt = '.temp'
+
 export type FsOptions = {
 
 }
@@ -69,7 +71,9 @@ export enum EventSet {
          let reqCursor = event.options.cursor || ''
          let reqCount = event.options.limit == null ? 100 : event.options.limit
 
+         // Ignore any Temp files that may be in the directory
          let files = await fs.readdir(modelDir)
+         files = files.filter(it => path.parse(it).ext !== TempFileExt)
          files.sort()
 
          let cursor = ''
@@ -80,8 +84,8 @@ export enum EventSet {
          if (reqCursor !== '') {
             let names = files.map(f => path.parse(f).name)
 
-            let decodedCursor = Buffer.from(reqCursor, 'base64').toString('ascii')            
-            let found = names.findIndex(decodedCursor)
+            let decodedCursor = Buffer.from(reqCursor, 'base64').toString('ascii')
+            let found = names.findIndex(it => it === decodedCursor)
 
             if (found < 0) {
                found = 0
@@ -91,8 +95,7 @@ export enum EventSet {
             }
          }
 
-         let endIndex = Math.min((files.length - startIndex), reqCount)
-
+         let endIndex = reqCount + startIndex
          requestedFiles = files.slice(startIndex, endIndex)
 
          if (endIndex < (files.length - 1)) {
@@ -117,8 +120,13 @@ export enum EventSet {
       //-------------------------------------------------------------------------------------------
       router.on<SaveObjectEvent<StackObject>>(EventSet.ObjectSaved, async (event: SaveObjectEvent<StackObject>) => {
          let modelDir = this.getModelDir(event.model.name)
-         await fs.ensureDir(modelDir)
-         await fs.writeJson(path.join(modelDir, `${event.serialize.id}.json`), event.serialize.toJs())
+
+         try {
+            await fs.ensureDir(modelDir)
+            await fs.writeJson(path.join(modelDir, `${event.serialize.id}.json`), event.serialize.toJs(), { spaces: 2 })
+         } catch (err) {
+            throw new Error(`[stacks-fs] Failed to save object. Reason: ${err}`)
+         }
       })
 
       //-------------------------------------------------------------------------------------------
@@ -128,45 +136,55 @@ export enum EventSet {
          try {
             let obj = await fs.readJson(objectPath)
             event.object = obj
-         } catch(err) {
-            throw new Error(`Failed to retrieve Object ${event.id}. Reason ${err}`)
+         } catch (err) {
+            throw new Error(`[stacks-fs] Failed to retrieve Object ${event.id}. Reason ${err}`)
          }
       })
 
       //-------------------------------------------------------------------------------------------
       router.on<DeleteObjectEvent<StackObject>>(EventSet.ObjectDeleted, async (event: DeleteObjectEvent<StackObject>) => {
-         let objectPath = this.getObjectPath(event.model.id, event.object.id)
+         let objectPath = this.getObjectPath(event.model.name, event.object.id)
 
          try {
             await fs.remove(objectPath)
-         } catch(err) {
-            throw new Error(`Failed to delete an Object ${event.object.id}. Reason ${err}`)
+         } catch (err) {
+            throw new Error(`[stacks-fs] Failed to delete an Object ${event.object.id}. Reason ${err}`)
          }
       })
 
       //-------------------------------------------------------------------------------------------
       router.on<UpdateObjectEvent<StackObject>>(EventSet.ObjectUpdated, async (event: UpdateObjectEvent<StackObject>) => {
-         let objectPath = this.getObjectPath(event.model.id, event.object.id)
-         console.log(objectPath)
-         let exists = await fs.access(objectPath)
+         let objectPath = this.getObjectPath(event.model.name, event.object.id)
+         let tempPath = `${objectPath}${TempFileExt}`
 
-         if(exists) {
+         try {
+            await fs.access(objectPath)
+
             event.exists = ExistState.Exists
 
-            // try {
-            //    await fs.remove(objectPath)
-            //    await fs.writeJson(objectPath, event.object)
-            //    event.object = obj
-            // } catch(err) {
+            // We ensure we always have a copy of the original until we're done writing
+            // the changed file. We remove the copy if the write is sucessful, otherwise
+            // we rollback the change and keep the copy.
+            await fs.copy(objectPath, tempPath)
+            await fs.remove(objectPath)
+            await fs.writeJson(objectPath, event.serialize.toJs(), { spaces: 2 })
+         } catch (err) {
+            try {
+               await fs.access(tempPath)
+               await fs.move(tempPath, objectPath, { overwrite: true })
+            } catch (err) {
+               // swallow
+            }
 
-            // }
+            throw new Error(`[stacks-fs] Failed to update an Object ${event.object.id}. Reason ${err}`)
+         } finally {
+            try {
+               await fs.access(tempPath)
+               await fs.remove(tempPath)
+            } catch (err) {
+               // swallow
+            }
          }
-
-         // try {
-         //    await fs.remove(objectPath)
-         // } catch(err) {
-         //    throw new Error(`Failed to delete an Object ${event.object.id}. Reason ${err}`)
-         // }
       })
    }
 

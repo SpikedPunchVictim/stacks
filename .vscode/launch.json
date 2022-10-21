@@ -36,6 +36,7 @@
          "protocol": "inspector",
          "smartStep": true,
          "env": {
+            "NODE_PATH": "${workspaceRoot}/dev/node_modules",
             "TS_NODE_PROJECT": "${workspaceRoot}/dev/tsconfig.json"
          },
          "skipFiles": [

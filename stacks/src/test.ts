@@ -1,10 +1,10 @@
-import { Stack, StackObject } from '.'
+import { ExistState, Stack, StackObject } from '.'
 
 async function main(): Promise<void> {
    let stack = Stack.create()
 
    type UserType = {
-      nme: string
+      name: string
       age: number
       money: number
       team: TeamType
@@ -67,6 +67,14 @@ async function main(): Promise<void> {
 
    let chris = await User.create<UserType>({
       name: 'chris'
+   })
+
+   stack.update.object(User, chris, async (obj, state) => {
+      if(state === ExistState.DoesNotExist) {
+         return
+      }
+
+      obj!.age = 34
    })
 
    console.dir(chris, { depth: null })

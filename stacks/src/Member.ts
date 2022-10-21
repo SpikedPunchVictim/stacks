@@ -47,16 +47,16 @@ export class Member implements IMember {
    /**
     * Creates an Array of Members from the ModelCreate Parameters
     * 
-    * @param obj The ModelCreate parameters
+    * @param params The ModelCreate parameters
     * @param createContext The ValueCreateContext
     * @param context The StackContext
     * @returns An Array of Members based on the ModelCreate
     */
-   static create(obj: ModelCreateParams, createContext: ValueCreateContext, context: IStackContext): IMember[] {
+   static create(params: ModelCreateParams, createContext: ValueCreateContext, context: IStackContext): IMember[] {
       let results = new Array<IMember>()
 
-      for (let key of Object.keys(obj)) {
-         let value = obj[key]
+      for (let key of Object.keys(params)) {
+         let value = params[key]
 
          let id = context.uid.generateLocal()
 

@@ -1,6 +1,7 @@
 import {
    IModel,
    IStack,
+   ObjectCreateParams,
    StackObject
 } from '@spikedpunch/stacks'
 
@@ -217,6 +218,7 @@ export class StacksRest {
 
             if (!body) {
                ctx.throw(400, `A body must be provided`)
+               return
             }
 
             let id = ctx.params.id
@@ -284,7 +286,12 @@ export class StacksRest {
          let model = options.model as IModel
          let body = ctx.request.body
 
-         let obj = await model.create(body)
+         if (!body) {
+            ctx.throw(400, `A body must be provided`)
+            return
+         }
+
+         let obj = await model.create(body as ObjectCreateParams)
          await model.save(obj)
 
          ctx.body = buildDetailedResponse(obj)

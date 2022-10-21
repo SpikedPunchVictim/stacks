@@ -395,8 +395,17 @@ export class Orchestrator implements IOrchestrator {
       return hasId
    }
 
+   /**
+    * Updates an already existing object with the latest from the stored version.
+    * This method is intended to be used on long lived objects where we want them
+    * to be updated locally, and not saved.
+    * 
+    * @param model The Model
+    * @param obj The Object
+    * @param onUpdate Function to update the Object based on the latest version
+    */
    async updateObject<T extends StackObject>(model: IModel, obj: T, onUpdate: UpdateObjectHandler<T>): Promise<void> {
-      await this.rfc.create(new UpdateObjectEvent<T>(model, obj))
+      await this.rfc.create(new UpdateObjectEvent<T>(model, obj, ProxyObject.unwrap(obj)))
          .fulfill(async (event) => {
             let cast = event as UpdateObjectEvent<T>
 

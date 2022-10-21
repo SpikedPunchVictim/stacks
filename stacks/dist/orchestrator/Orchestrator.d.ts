@@ -113,5 +113,14 @@ export declare class Orchestrator implements IOrchestrator {
     deleteObject<T extends StackObject>(model: IModel, obj: T): Promise<void>;
     getObject<T extends StackObject>(model: IModel, id: string): Promise<T | undefined>;
     hasId(id: string): Promise<boolean>;
+    /**
+     * Updates an already existing object with the latest from the stored version.
+     * This method is intended to be used on long lived objects where we want them
+     * to be updated locally, and not saved.
+     *
+     * @param model The Model
+     * @param obj The Object
+     * @param onUpdate Function to update the Object based on the latest version
+     */
     updateObject<T extends StackObject>(model: IModel, obj: T, onUpdate: UpdateObjectHandler<T>): Promise<void>;
 }

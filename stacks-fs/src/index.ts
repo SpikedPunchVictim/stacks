@@ -20,7 +20,7 @@ import * as fs from 'fs-extra'
 const TempFileExt = '.temp'
 
 export type FsOptions = {
-
+   objectNameField?: string   // The field to use for the Object's file name. Defaults to 'id'
 }
 
 /**
@@ -155,35 +155,15 @@ export enum EventSet {
       //-------------------------------------------------------------------------------------------
       router.on<UpdateObjectEvent<StackObject>>(EventSet.ObjectUpdated, async (event: UpdateObjectEvent<StackObject>) => {
          let objectPath = this.getObjectPath(event.model.name, event.object.id)
-         let tempPath = `${objectPath}${TempFileExt}`
 
          try {
             await fs.access(objectPath)
 
             event.exists = ExistState.Exists
 
-            // We ensure we always have a copy of the original until we're done writing
-            // the changed file. We remove the copy if the write is sucessful, otherwise
-            // we rollback the change and keep the copy.
-            await fs.copy(objectPath, tempPath)
-            await fs.remove(objectPath)
-            await fs.writeJson(objectPath, event.serialize.toJs(), { spaces: 2 })
+            event.updated = await fs.readJson(objectPath)
          } catch (err) {
-            try {
-               await fs.access(tempPath)
-               await fs.move(tempPath, objectPath, { overwrite: true })
-            } catch (err) {
-               // swallow
-            }
-
-            throw new Error(`[stacks-fs] Failed to update an Object ${event.object.id}. Reason ${err}`)
-         } finally {
-            try {
-               await fs.access(tempPath)
-               await fs.remove(tempPath)
-            } catch (err) {
-               // swallow
-            }
+            event.exists = ExistState.DoesNotExist
          }
       })
    }

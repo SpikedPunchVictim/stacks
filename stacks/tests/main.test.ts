@@ -1,3 +1,4 @@
+import test from 'node:test'
 import { IModel, IStack, IValueSource, MemberInfo, Stack, StackObject } from '../src'
 import { UidKeeper } from '../src/UidKeeper'
 import { createScenario, validateModel, validateObject } from './Utils'
@@ -168,6 +169,24 @@ describe(`# Models`, () => {
       }
 
       expect(didThrow).toBe(false)
+   })
+
+   test(`Can add Symbols`, async () => {
+      let stack = Stack.create()
+
+      let model = await stack.create.model('user', {
+         name: 'rick',
+         age: ({ uint }) => uint(69),
+         bool: true
+      })
+
+      model.symbols.push({
+         name: 'test',
+         value: 'test-value'
+      })
+
+      expect(model.symbols[0].name).toBe('test')
+      expect(model.symbols[0].value).toBe('test-value')
    })
 
    // TODO: Test every type

@@ -16,7 +16,7 @@
    * path segment in the "$schema" field for all your Rush config files.  This will ensure
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
-  "rushVersion": "5.75.0",
+  "rushVersion": "5.81.0",
 
   /**
    * The next field selects which package manager should be installed and determines its version.
@@ -447,6 +447,10 @@
     {
       "packageName": "@spikedpunch/stacks-fs",
       "projectFolder": "stacks-fs"
+    },
+    {
+      "packageName": "@spikedpunch/stacks-dynamo",
+      "projectFolder": "stacks-dynamo"
     }
   ]
 }

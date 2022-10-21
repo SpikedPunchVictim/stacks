@@ -1,6 +1,7 @@
 import { StackObject } from "../StackObject";
 import { IModel } from "../Model";
 import { Event, EventSet, ExistState } from "./Event";
+import { IProxyObject } from "../ProxyObject";
 
 
 export class UpdateObjectEvent<T extends StackObject> extends Event {
@@ -36,7 +37,7 @@ export class UpdateObjectEvent<T extends StackObject> extends Event {
    private _exists: ExistState = ExistState.Unset
    private _updated: T | undefined
 
-   constructor(readonly model: IModel, readonly object: T) {
+   constructor(readonly model: IModel, readonly object: T, readonly serialize: IProxyObject) {
       super(EventSet.ObjectUpdated)
    }
 }

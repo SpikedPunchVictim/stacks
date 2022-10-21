@@ -49,7 +49,13 @@ export declare class ProxyObject implements IProxyObject {
      * @returns
      */
     static fromCreated<T extends StackObject>(model: IModel, obj: ObjectCreateParams, context: IStackContext): Promise<T>;
-    static unwrap(serialized: IProxyObject): IProxyObject;
+    /**
+     * Returns the IProxyObject that is wrapped in the provided Proxy
+     *
+     * @param serialized A Proxy. Type 'any' is used here since there are no tests for Proxy
+     * @returns
+     */
+    static unwrap(serialized: any): IProxyObject;
     toJs<T extends StackObject>(): T;
     private static buildNestedEditObject;
     internaleSetId(id: string): void;

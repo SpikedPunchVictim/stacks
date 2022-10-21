@@ -31,6 +31,7 @@ export interface IModel {
     readonly id: string;
     readonly name: string;
     readonly members: IMemberCollection;
+    readonly symbols: SymbolEntry[];
     /**
      * Appends additional Members to the Model
      *
@@ -87,6 +88,7 @@ export declare class Model implements IModel {
     private get orchestrator();
     private get serializer();
     readonly members: IMemberCollection;
+    readonly symbols: SymbolEntry[];
     constructor(name: string, id: string, context: IStackContext);
     append(obj: ModelCreateParams): Promise<void>;
     save<T extends StackObject>(obj: T): Promise<void>;

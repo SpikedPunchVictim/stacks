@@ -40,6 +40,7 @@ export interface IModel {
    readonly name: string
 
    readonly members: IMemberCollection
+   readonly symbols: SymbolEntry[]
 
    /**
     * Appends additional Members to the Model
@@ -113,6 +114,7 @@ export class Model implements IModel {
    }   
 
    readonly members: IMemberCollection
+   readonly symbols: SymbolEntry[]
 
    constructor(name: string, id: string, context: IStackContext) {
       this.name = name
@@ -120,6 +122,7 @@ export class Model implements IModel {
       this.context = context
 
       this.members = new MemberCollection(this, this.context)
+      this.symbols = new Array<SymbolEntry>()
    }
 
    async append(obj: ModelCreateParams): Promise<void> {

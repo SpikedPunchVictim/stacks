@@ -43,7 +43,7 @@ export declare class ValueSource implements IValueSource {
      */
     static toProxy(values: IValueSource): IValueSource;
     /**
-     * Resolves a set of ValuePArams into a Value
+     * Resolves a set of ValueParams into a Value
      *
      * @param source The ParamS
      * @param context StackContext

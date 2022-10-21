@@ -78,8 +78,15 @@ type SodaPop = {
 let Soda = await stack.create.model('soda', {
    name: '',
    cost: 0,
-   diest: false
+   diet: false
 })
+
+// Models can contain metadata, called Symbols, to help configure
+// plugin specific options.
+Soda.symbols.push(...[
+   { name: 'dynamo:partitionKeyField', value: 'cost' },
+   { name: 'dynamo:partitionKeyType', value: 'number' }
+])
 
 // Bootstrap is called after all Models have been created.
 // This allows Plugins to run any initialization code based
@@ -87,6 +94,8 @@ let Soda = await stack.create.model('soda', {
 await stack.bootstrap()
 
 let coke = await Sode.create()
+
+coke.cost = 100
 
 // This SodaPop object is saved in Redis and Dynamo
 // If the save() fails for any plugin, the save()

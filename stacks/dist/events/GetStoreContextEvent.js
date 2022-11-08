@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GetStoreContextEvent = void 0;
+const Event_1 = require("./Event");
+class GetStoreContextEvent extends Event_1.Event {
+    constructor() {
+        super(Event_1.EventSet.GetStoreContext);
+        this.contexts = new Array();
+    }
+}
+exports.GetStoreContextEvent = GetStoreContextEvent;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiR2V0U3RvcmVDb250ZXh0RXZlbnQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvZXZlbnRzL0dldFN0b3JlQ29udGV4dEV2ZW50LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7OztBQUNBLG1DQUF5QztBQUd6QyxNQUFhLG9CQUFxQixTQUFRLGFBQUs7SUFHNUM7UUFDRyxLQUFLLENBQUMsZ0JBQVEsQ0FBQyxlQUFlLENBQUMsQ0FBQTtRQUh6QixhQUFRLEdBQW1CLElBQUksS0FBSyxFQUFnQixDQUFBO0lBSTdELENBQUM7Q0FDSDtBQU5ELG9EQU1DIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgU3RvcmVDb250ZXh0IH0gZnJvbSBcIi4uL3N0YWNrL1N0YWNrXCJcbmltcG9ydCB7IEV2ZW50LCBFdmVudFNldCB9IGZyb20gXCIuL0V2ZW50XCJcblxuXG5leHBvcnQgY2xhc3MgR2V0U3RvcmVDb250ZXh0RXZlbnQgZXh0ZW5kcyBFdmVudCB7XG4gICByZWFkb25seSBjb250ZXh0czogU3RvcmVDb250ZXh0W10gPSBuZXcgQXJyYXk8U3RvcmVDb250ZXh0PigpXG5cbiAgIGNvbnN0cnVjdG9yKCkge1xuICAgICAgc3VwZXIoRXZlbnRTZXQuR2V0U3RvcmVDb250ZXh0KVxuICAgfVxufSJdfQ==

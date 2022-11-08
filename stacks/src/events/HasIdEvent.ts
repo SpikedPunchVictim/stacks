@@ -1,5 +1,5 @@
+import { IModel } from "../Model";
 import { EventSet, Event } from "./Event";
-
 
 export class HasIdEvent extends Event {
    get attemptedSet(): boolean {
@@ -22,7 +22,7 @@ export class HasIdEvent extends Event {
    private _hasId: boolean = false
    private _attemptedSet: boolean = false
 
-   constructor(readonly id: string) {
+   constructor(readonly id: string, readonly model: IModel) {
       super(EventSet.HasId)
    }
 }

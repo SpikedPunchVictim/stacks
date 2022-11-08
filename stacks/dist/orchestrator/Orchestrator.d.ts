@@ -1,12 +1,12 @@
 import { StackObject } from "../StackObject";
 import { ICache } from "../Cache";
-import { IRequestForChangeSource } from "../events/RequestForChange";
 import { IModel, ModelCreateParams, ObjectCreateParams, PageRequest, PageResponse } from "../Model";
-import { IStack } from "../stack/Stack";
+import { ApplyStoreContextHandler, IStack } from "../stack/Stack";
 import { IStackContext } from "../stack/StackContext";
 import { UpdateObjectHandler } from "../stack/StackUpdate";
 import { IUidKeeper } from "../UidKeeper";
 import { IValueSerializer } from "../serialize/ValueSerializer";
+import { IRequestForChangeSource } from '../events';
 export interface IOrchestrator {
     /**
      * Bootstraps the Stack.
@@ -78,14 +78,23 @@ export interface IOrchestrator {
      * Determines if an ID is already in use.
      *
      * @param id The ID to test
+     * @param model The associated Model
      */
-    hasId(id: string): Promise<boolean>;
+    hasId(id: string, model: IModel): Promise<boolean>;
     /**
-     * Updates the values of an Object
+     * Creates and stores a custom Query Object
      *
-     * @param model The Model of the Object
-     * @param obj The Object to update
-     * @param onUpdate Handler that is called after an Object has been updated
+     * @param handler The handler to create the custom Query Object
+     */
+    storeQueryObject<T>(handler: ApplyStoreContextHandler<T>): Promise<T | undefined>;
+    /**
+     * Updates an already existing object with the latest from the stored version.
+     * This method is intended to be used on long lived objects where we want them
+     * to be updated locally, and not saved.
+     *
+     * @param model The Model
+     * @param obj The Object
+     * @param onUpdate Function to update the Object based on the latest version
      */
     updateObject<T extends StackObject>(model: IModel, obj: T, onUpdate: UpdateObjectHandler<T>): Promise<void>;
 }
@@ -112,7 +121,8 @@ export declare class Orchestrator implements IOrchestrator {
     getManyObjects<T extends StackObject>(model: IModel, options?: PageRequest): Promise<PageResponse<T>>;
     deleteObject<T extends StackObject>(model: IModel, obj: T): Promise<void>;
     getObject<T extends StackObject>(model: IModel, id: string): Promise<T | undefined>;
-    hasId(id: string): Promise<boolean>;
+    hasId(id: string, model: IModel): Promise<boolean>;
+    storeQueryObject<T>(handler: ApplyStoreContextHandler<T>): Promise<T | undefined>;
     /**
      * Updates an already existing object with the latest from the stored version.
      * This method is intended to be used on long lived objects where we want them

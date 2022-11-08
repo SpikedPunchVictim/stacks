@@ -12,6 +12,7 @@ export declare class DynamoDbPlugin implements IPlugin {
     readonly options: DynamoDbPluginConfig;
     readonly name: string;
     private client;
+    private version;
     constructor(baseDir: string, options: DynamoDbPluginConfig);
     setup(stack: IStack, router: IEventRouter): Promise<void>;
 }

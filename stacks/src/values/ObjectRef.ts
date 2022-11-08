@@ -4,12 +4,19 @@ import { ValueSerializer } from "../serialize/ValueSerializer";
 import { IStackContext } from "../stack/StackContext";
 import { isStackObject, StackObject } from "../StackObject";
 import { UidKeeper } from "../UidKeeper";
-import { IType, Type, TypeSet, ValidateResult } from "./Type";
+import { IType, Type, TypeInfo, TypeSet, ValidateResult } from "./Type";
 import { IValue, Value } from "./Value";
 
 export class ObjectRefType extends Type {
    get orchestrator(): IOrchestrator {
       return this.context.orchestrator
+   }
+
+   get info(): TypeInfo {
+      return {
+         type: this.type,
+         modelName: this.modelName
+      }
    }
 
    constructor(readonly modelName: string, readonly context: IStackContext) {

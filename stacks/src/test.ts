@@ -77,6 +77,18 @@ async function main(): Promise<void> {
       obj!.age = 34
    })
 
+   /*
+      type StoreContext = {
+         name: string      // The data store name (ie stacks:dynamo)
+         version: string   // The data store version
+         store: any
+      }
+
+      stack.setQuery(async (context: StoreContext) => {
+         let query = new CustomQueryObject(context)
+      })
+   */
+
    console.dir(chris, { depth: null })
 }
 

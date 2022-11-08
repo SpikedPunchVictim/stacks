@@ -81,15 +81,44 @@ export interface IModel {
      */
     validate<T>(obj: T): Promise<ValidationReport>;
 }
-export declare class Model implements IModel {
+export declare class NoOpModel implements IModel {
     readonly id: string;
     readonly name: string;
-    readonly context: IStackContext;
-    private get orchestrator();
-    private get serializer();
     readonly members: IMemberCollection;
     readonly symbols: SymbolEntry[];
-    constructor(name: string, id: string, context: IStackContext);
+    constructor();
+    append(obj: ModelCreateParams): Promise<void>;
+    save<T extends StackObject>(object: T): Promise<void>;
+    create<T extends StackObject>(obj?: ObjectCreateParams): Promise<T>;
+    delete<T extends StackObject>(object: T): Promise<void>;
+    get<T extends StackObject>(id: string): Promise<T | undefined>;
+    getAll<T extends StackObject>(): Promise<T[]>;
+    getMany<T extends StackObject>(req?: PageRequest): Promise<PageResponse<T>>;
+    toJs<T>(): Promise<T>;
+    validate<T>(obj: T): Promise<ValidationReport>;
+}
+export declare class Model implements IModel {
+    get id(): string;
+    readonly name: string;
+    readonly context: IStackContext;
+    readonly members: IMemberCollection;
+    readonly symbols: SymbolEntry[];
+    static get NoOp(): IModel;
+    private get orchestrator();
+    private get serializer();
+    private static _noop;
+    private _id;
+    private constructor();
+    static create(name: string, context: IStackContext): Promise<IModel>;
+    static isModel(obj: any): boolean;
+    /**
+     * Determines if an Object is a Model. If it is, then it will return a
+     * cast value of the Model, otherwise undefined.
+     *
+     * @param obj The Object to cast
+     * @returns
+     */
+    static asModel(obj: any): IModel | undefined;
     append(obj: ModelCreateParams): Promise<void>;
     save<T extends StackObject>(obj: T): Promise<void>;
     create<T extends StackObject>(params?: ObjectCreateParams): Promise<T>;
@@ -99,4 +128,5 @@ export declare class Model implements IModel {
     getMany<T extends StackObject>(req?: PageRequest): Promise<PageResponse<T>>;
     toJs<T>(): Promise<T>;
     validate<T>(obj: T): Promise<ValidationReport>;
+    private setId;
 }

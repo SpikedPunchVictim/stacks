@@ -451,6 +451,10 @@
     {
       "packageName": "@spikedpunch/stacks-dynamo",
       "projectFolder": "stacks-dynamo"
+    },
+    {
+      "packageName": "@spikedpunch/stacks-postgres",
+      "projectFolder": "stacks-postgres"
     }
   ]
 }

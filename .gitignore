@@ -1,6 +1,7 @@
 
 # Project
 stacks-fs/store/
+stacks-postgres/localstack
 
 # Logs
 *.log

@@ -1,13 +1,18 @@
+import path from 'path'
+import fs from 'fs-extra'
+
 import {
    BootstrapEvent,
    EventSet,
    // ExistState,
    // GetObjectEvent,
+   GetStoreContextEvent,
    IPlugin,
    IStack,
    IEventRouter,
-   SaveObjectEvent,
+   ObjectSaveEvent,
    StackObject,
+   SymbolEntry
    // GetManyObjectsEvent,
    // IModel,
    // DeleteObjectEvent,
@@ -18,7 +23,6 @@ import {
    Dynatron,
    DynatronClient,
    DynatronClientConfig,
-
 } from 'dynatron'
 
 
@@ -37,6 +41,7 @@ export class DynamoDbPlugin implements IPlugin {
    readonly name: string = 'stacks-dynamo'
 
    private client: Dynatron
+   private version: string | undefined = undefined
 
    constructor(readonly baseDir: string, readonly options: DynamoDbPluginConfig) {
       // TODO: Normalize options
@@ -64,9 +69,37 @@ export enum EventSet {
 
       //-------------------------------------------------------------------------------------------
       router.on<BootstrapEvent>(EventSet.Bootstrap, async (event: BootstrapEvent) => {
-         // for(let model of stack.get.models()) {
-         //    //model.
-         // }
+         for(let model of stack.get.models()) {
+            let symbols = new Array<SymbolEntry>()
+
+            for(let symbol of model.symbols) {
+               if(symbol.name.startsWith('dynamo:')) {
+                  symbols.push(symbol)
+               }
+            }
+
+            if(symbols.length == 0) {
+               continue
+            }
+
+            
+         }
+      })
+
+      router.on(EventSet.GetStoreContext, async (event: GetStoreContextEvent) => {
+         if(this.version === undefined) {
+            let pkg = await fs.readJson(path.join(__dirname, '..', 'package.json'))
+            this.version = pkg.version
+         }
+
+         event.contexts.push({
+            name: 'stacks:fs',
+            version: this.version || 'version-not-set',
+            store: {
+               client: this.client,
+               options: this.options
+            }
+         })
       })
 
       //-------------------------------------------------------------------------------------------
@@ -122,7 +155,7 @@ export enum EventSet {
       // })
 
       //-------------------------------------------------------------------------------------------
-      router.on<SaveObjectEvent<StackObject>>(EventSet.ObjectSaved, async (event: SaveObjectEvent<StackObject>) => {
+      router.on<ObjectSaveEvent<StackObject>>(EventSet.ObjectSaved, async (event: ObjectSaveEvent<StackObject>) => {
          /*
             readonly model: IModel
             readonly object: T

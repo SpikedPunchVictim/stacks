@@ -26,7 +26,7 @@ export interface IFieldCollection {
      *
      * @param visit Handler used to transform each Field
      */
-    map<T>(visit: VisitHandler<IField>): void[];
+    map<TResult>(visit: VisitHandler<IField, TResult>): TResult[];
     /**
      * Sets a Field's value
      *
@@ -40,7 +40,7 @@ export declare class FieldCollection implements IFieldCollection {
     constructor(fields: IField[]);
     [Symbol.iterator](): Iterator<IField>;
     get(name: string): IField | undefined;
-    map<T>(visit: VisitHandler<IField>): void[];
+    map<TResult>(visit: VisitHandler<IField, TResult>): TResult[];
     set(name: string, value: ValueCreateParams): Promise<void>;
     switch(handler: FieldSwitchHandler): Promise<void>;
 }

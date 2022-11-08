@@ -32,7 +32,7 @@ export interface IFieldCollection {
     * 
     * @param visit Handler used to transform each Field
     */
-   map<T>(visit: VisitHandler<IField>): void[]
+   map<TResult>(visit: VisitHandler<IField, TResult>): TResult[]
 
    /**
     * Sets a Field's value
@@ -64,7 +64,7 @@ export class FieldCollection implements IFieldCollection {
       return this.fields.find(f => f.name === name)
    }
 
-   map<T>(visit: VisitHandler<IField>): void[] {
+   map<TResult>(visit: VisitHandler<IField, TResult>): TResult[] {
       return this.fields.map(visit)
    }
 

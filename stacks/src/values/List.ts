@@ -1,9 +1,16 @@
 import { IValueSerializer, ValueSerializer } from "../serialize/ValueSerializer"
-import { IType, Type, TypeSet, ValidateResult } from "./Type"
+import { IType, Type, TypeInfo, TypeSet, ValidateResult } from "./Type"
 import { IValue, Value } from "./Value"
 
 
 export class ListType extends Type {
+   get info(): TypeInfo {
+      return {
+         type: this.type,
+         itemType: this.itemType.info
+      }
+   }
+
    constructor(readonly itemType: IType) {
       super(TypeSet.List)
    }

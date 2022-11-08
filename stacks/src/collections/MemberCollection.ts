@@ -1,8 +1,8 @@
 import { IMember, Member, MemberValue } from "../Member";
-import { IModel, ModelCreateParams } from '../Model'
+import { IModel, Model, ModelCreateParams } from '../Model'
 import { IStackContext } from "../stack/StackContext";
 import { IUidKeeper } from "../UidKeeper";
-import { VisitHandler } from "./Handlers";
+import { PredicateHandler, VisitHandler } from "./Handlers";
 
 export interface IMemberCollection {
    readonly model: IModel
@@ -12,28 +12,59 @@ export interface IMemberCollection {
    add(name: string, value: MemberValue): Promise<void>
    append(obj: ModelCreateParams): Promise<void>
    delete(name: string): Promise<void>
-   find(predicate: VisitHandler<IMember>): IMember | undefined
+   find(predicate: PredicateHandler<IMember>): IMember | undefined
 
    /**
     * Maps the Members into another structure
     * 
     * @param visit Handler used to transform each Field
     */
-    map<T>(visit: VisitHandler<IMember>): void[]
+   map<T>(visit: VisitHandler<IMember, T>): T[]
 
    get(name: string): IMember | undefined
 }
 
+export class NoOpMemberCollection implements IMemberCollection {
+   model: IModel;
+
+   constructor() {
+      this.model = Model.NoOp
+   }
+   
+   add(name: string, value: MemberValue): Promise<void> {
+      throw new Error("Method not implemented.");
+   }
+   append(obj: ModelCreateParams): Promise<void> {
+      throw new Error("Method not implemented.");
+   }
+   delete(name: string): Promise<void> {
+      throw new Error("Method not implemented.");
+   }
+   find(predicate: PredicateHandler<IMember>): IMember | undefined {
+      throw new Error("Method not implemented.");
+   }
+   map<T>(visit: VisitHandler<IMember, T>): T[] {
+      throw new Error("Method not implemented.");
+   }
+   get(name: string): IMember | undefined {
+      throw new Error("Method not implemented.");
+   }
+   [Symbol.iterator](): Iterator<IMember, any, undefined> {
+      throw new Error("Method not implemented.");
+   }
+   
+}
+
 export class MemberCollection implements IMemberCollection {
    readonly model: IModel
-   readonly context : IStackContext
+   readonly context: IStackContext
 
    get uid(): IUidKeeper {
       return this.context.uid
    }
 
    private members: Array<IMember>
-   
+
    constructor(model: IModel, context: IStackContext) {
       this.model = model
       this.context = context
@@ -55,24 +86,24 @@ export class MemberCollection implements IMemberCollection {
    async add(name: string, value: MemberValue): Promise<void> {
       let found = this.members.find(m => m.name === name)
 
-      let member = Member.create({ [name]: value }, { model: this.model }, this.context)
+      let member = Member.create({ [name]: value }, this.model, { model: this.model }, this.context)
 
-      if(found !== undefined) {
+      if (found !== undefined) {
          found.value = member[0].value
          return
       }
-      
+
       this.members.push(...member)
    }
 
    async append(obj: ModelCreateParams): Promise<void> {
-      let members = Member.create(obj, { model: this.model }, this.context)
-      
-      for(let member of members) {
+      let members = Member.create(obj, this.model, { model: this.model }, this.context)
+
+      for (let member of members) {
          let found = this.members.find(m => m.name === member.name)
 
          // Replace an existing Member if the Types match
-         if(found !== undefined) {
+         if (found !== undefined) {
             found.value = member.value
             continue
          }
@@ -84,16 +115,16 @@ export class MemberCollection implements IMemberCollection {
    async delete(name: string): Promise<void> {
       let found = this.members.findIndex(m => m.name === name)
 
-      if(found) {
+      if (found) {
          this.members.splice(found, 1)
       }
    }
 
-   find(predicate: VisitHandler<IMember>): IMember | undefined {
+   find(predicate: PredicateHandler<IMember>): IMember | undefined {
       return this.members.find(predicate)
    }
 
-   map<T>(visit: VisitHandler<IMember>): void[] {
+   map<T>(visit: VisitHandler<IMember, T>): T[] {
       return this.members.map(visit)
    }
 

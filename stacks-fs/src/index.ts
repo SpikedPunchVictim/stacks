@@ -7,12 +7,13 @@ import {
    IPlugin,
    IStack,
    IEventRouter,
-   SaveObjectEvent,
    StackObject,
    GetManyObjectsEvent,
+   GetStoreContextEvent,
    IModel,
-   DeleteObjectEvent,
-   UpdateObjectEvent
+   ObjectDeleteEvent,
+   ObjectSaveEvent,
+   ObjectUpdateEvent
 } from '@spikedpunch/stacks'
 
 import * as fs from 'fs-extra'
@@ -32,6 +33,8 @@ export type FsOptions = {
 export class FsPlugin implements IPlugin {
    readonly name: string = 'stacks-fs'
    readonly options: FsOptions
+
+   private version: string | undefined = undefined // The plugin version
 
    constructor(readonly baseDir: string, options: FsOptions) {
       // TODO: Normalize baseDir (~, .., etc)
@@ -117,8 +120,25 @@ export enum EventSet {
          }
       })
 
+      router.on(EventSet.GetStoreContext, async (event: GetStoreContextEvent) => {
+         if(this.version === undefined) {
+            let pkg = await fs.readJson(path.join(__dirname, '..', 'package.json'))
+            this.version = pkg.version
+         }
+
+         event.contexts.push({
+            name: 'stacks:fs',
+            version: this.version || 'version-not-set',
+            store: {
+               baseDir: this.baseDir,
+               options: this.options,
+               fs: fs
+            }
+         })
+      })
+
       //-------------------------------------------------------------------------------------------
-      router.on<SaveObjectEvent<StackObject>>(EventSet.ObjectSaved, async (event: SaveObjectEvent<StackObject>) => {
+      router.on<ObjectSaveEvent<StackObject>>(EventSet.ObjectSaved, async (event: ObjectSaveEvent<StackObject>) => {
          let modelDir = this.getModelDir(event.model.name)
 
          try {
@@ -142,7 +162,7 @@ export enum EventSet {
       })
 
       //-------------------------------------------------------------------------------------------
-      router.on<DeleteObjectEvent<StackObject>>(EventSet.ObjectDeleted, async (event: DeleteObjectEvent<StackObject>) => {
+      router.on<ObjectDeleteEvent<StackObject>>(EventSet.ObjectDeleted, async (event: ObjectDeleteEvent<StackObject>) => {
          let objectPath = this.getObjectPath(event.model.name, event.object.id)
 
          try {
@@ -153,7 +173,7 @@ export enum EventSet {
       })
 
       //-------------------------------------------------------------------------------------------
-      router.on<UpdateObjectEvent<StackObject>>(EventSet.ObjectUpdated, async (event: UpdateObjectEvent<StackObject>) => {
+      router.on<ObjectUpdateEvent<StackObject>>(EventSet.ObjectUpdated, async (event: ObjectUpdateEvent<StackObject>) => {
          let objectPath = this.getObjectPath(event.model.name, event.object.id)
 
          try {

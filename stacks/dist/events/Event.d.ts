@@ -3,6 +3,7 @@ export declare enum EventSet {
     GetManyObjects = "get-many-objects",
     GetModel = "get-model",
     GetObject = "get-object",
+    GetStoreContext = "get-store-context",
     HasId = "has-id",
     ModelCreated = "model-created",
     ModelDeleted = "model-deleted",

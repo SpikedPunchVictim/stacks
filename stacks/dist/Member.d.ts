@@ -1,4 +1,4 @@
-import { ModelCreateParams, SymbolEntry } from "./Model";
+import { IModel, ModelCreateParams, SymbolEntry } from "./Model";
 import { IStackContext } from "./stack/StackContext";
 import { IType } from "./values/Type";
 import { CreateTypeHandler } from "./values/TypeSource";
@@ -16,6 +16,7 @@ export declare type MemberValue = ValueCreateParams | MemberInfo;
  */
 export interface IMember {
     readonly id: string;
+    readonly model: IModel;
     readonly type: IType;
     name: string;
     symbols: SymbolEntry[];
@@ -24,17 +25,19 @@ export interface IMember {
 export declare class Member implements IMember {
     readonly id: string;
     readonly name: string;
+    readonly model: IModel;
     get type(): IType;
     symbols: SymbolEntry[];
     value: IValue;
-    constructor(id: string, name: string, value: IValue, symbols?: SymbolEntry[]);
+    constructor(id: string, name: string, model: IModel, value: IValue, symbols?: SymbolEntry[]);
     /**
      * Creates an Array of Members from the ModelCreate Parameters
      *
      * @param params The ModelCreate parameters
+     * @param model The Parent Model
      * @param createContext The ValueCreateContext
      * @param context The StackContext
      * @returns An Array of Members based on the ModelCreate
      */
-    static create(params: ModelCreateParams, createContext: ValueCreateContext, context: IStackContext): IMember[];
+    static create(params: ModelCreateParams, model: IModel, createContext: ValueCreateContext, context: IStackContext): IMember[];
 }

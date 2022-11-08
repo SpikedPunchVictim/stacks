@@ -1,4 +1,3 @@
-import test from 'node:test'
 import { IModel, IStack, IValueSource, MemberInfo, Stack, StackObject } from '../src'
 import { UidKeeper } from '../src/UidKeeper'
 import { createScenario, validateModel, validateObject } from './Utils'
@@ -33,8 +32,9 @@ type ParentType = {
    string: string
    int: number
    uint: number
-   list: any[]
+   list: number[]
    ref: FlatType
+   refs: FlatType[]
 } & StackObject
 
 let ParentTypeCreater = {
@@ -43,7 +43,8 @@ let ParentTypeCreater = {
    int: -42,
    uint: 42,
    list: [ 0, 1, 2, 3, 4 ],
-   ref: ({ ref }: IValueSource) => ref(ModelNames.FlatType)
+   ref: ({ ref }: IValueSource) => ref(ModelNames.FlatType),
+   refs: ({ list, ref }) => list(ref(ModelNames.FlatType))
 }
 
 let ParentTypeValidater = {

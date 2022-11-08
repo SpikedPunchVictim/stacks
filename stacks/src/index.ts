@@ -8,7 +8,8 @@ export {
    ModelCreateParams,
    ObjectCreateParams,
    PageRequest,
-   PageResponse
+   PageResponse,
+   SymbolEntry
 } from './Model'
 
 export { StackObject } from './StackObject'

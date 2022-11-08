@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: "postgres:15.0-alpine"
+    container_name: postgres-stacks
+    networks:
+      - postgres_stacks
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./localstack/postgres:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_DB=stacks
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=admin
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - postgres_stacks
+
+networks:
+  postgres_stacks:
+    name: postgres_stacks

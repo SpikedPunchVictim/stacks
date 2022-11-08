@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1646274748224" clover="3.2.0">
-  <project timestamp="1646274748224" name="All files">
+<coverage generated="1667413912590" clover="3.2.0">
+  <project timestamp="1667413912590" name="All files">
     <metrics statements="71" coveredstatements="68" conditionals="12" coveredconditionals="11" methods="3" coveredmethods="3" elements="86" coveredelements="82" complexity="0" loc="71" ncloc="71" packages="1" files="1" classes="1"/>
     <file name="Utils.ts" path="/Users/spikedpunchvictim/projects/stacks/stacks/tests/Utils.ts">
       <metrics statements="71" coveredstatements="68" conditionals="12" coveredconditionals="11" methods="3" coveredmethods="3"/>

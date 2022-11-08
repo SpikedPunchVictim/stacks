@@ -34,8 +34,8 @@ let tests: EventTest[] = [
    },
    {
       event: EventSet.HasId,
-      run: async ({ stack }) => {
-         await stack.hasId('0')
+      run: async ({ stack, model }) => {
+         await stack.hasId('0', model)
       }
    },
    {

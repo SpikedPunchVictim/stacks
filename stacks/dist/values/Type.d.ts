@@ -19,8 +19,20 @@ export declare type ValidateResult = {
     success: boolean;
     error?: Error;
 };
+export declare type TypeInfo = {
+    type: TypeSet;
+    /**
+     * This is set when the Type is a List
+     */
+    itemType?: TypeInfo;
+    /**
+     * This is set when the Type is an ObjectRef
+     */
+    modelName?: string;
+};
 export interface IType {
     readonly type: TypeSet;
+    readonly info: TypeInfo;
     /**
      * Determines if another Type is equal
      *
@@ -42,6 +54,7 @@ export interface IType {
 }
 export declare abstract class Type implements IType {
     readonly type: TypeSet;
+    get info(): TypeInfo;
     constructor(type: TypeSet);
     static isType(obj: IType): boolean;
     equals(other: IType): boolean;
@@ -49,6 +62,7 @@ export declare abstract class Type implements IType {
 }
 export declare abstract class BasicType<T> implements IType {
     readonly type: TypeSet;
+    get info(): TypeInfo;
     constructor(type: TypeSet);
     equals(other: IType): boolean;
     validate<T>(obj: T): Promise<ValidateResult>;

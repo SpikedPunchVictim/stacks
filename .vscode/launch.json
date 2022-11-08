@@ -94,6 +94,18 @@
          ],
          "program": "${workspaceFolder}/${relativeFile}",
          "cwd": "${workspaceFolder}/stacks-fs"
-     }
+     },
+     {
+      "name": "[stacks-postgres] JS | Current File",
+      "type": "node",
+      "request": "launch",
+      "smartStep": true,
+      "skipFiles": [
+          "<node_internals>/**",
+          "node_modules/**"
+      ],
+      "program": "${workspaceFolder}/${relativeFile}",
+      "cwd": "${workspaceFolder}/stacks-postgres"
+  }
    ]
 }

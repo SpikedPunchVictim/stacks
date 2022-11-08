@@ -1,8 +1,9 @@
 import { IValueSerializer, ValueSerializer } from "../serialize/ValueSerializer";
-import { IType, Type, ValidateResult } from "./Type";
+import { IType, Type, TypeInfo, ValidateResult } from "./Type";
 import { IValue, Value } from "./Value";
 export declare class ListType extends Type {
     readonly itemType: IType;
+    get info(): TypeInfo;
     constructor(itemType: IType);
     equals(other: IType): boolean;
     validate<T>(obj: T): Promise<ValidateResult>;

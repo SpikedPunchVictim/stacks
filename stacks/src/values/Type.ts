@@ -36,8 +36,22 @@ export type ValidateResult = {
    error?: Error
 }
 
+export type TypeInfo = {
+   type: TypeSet,
+   /**
+    * This is set when the Type is a List
+    */
+   itemType?: TypeInfo
+   /**
+    * This is set when the Type is an ObjectRef
+    */
+   modelName?: string
+}
+
 export interface IType {
    readonly type: TypeSet
+
+   readonly info: TypeInfo
 
    /**
     * Determines if another Type is equal
@@ -63,6 +77,10 @@ export interface IType {
 export abstract class Type implements IType {
    readonly type: TypeSet
 
+   get info(): TypeInfo {
+      throw new Error("Property not supported")
+   }
+
    constructor(type: TypeSet) {
       this.type = type
    }
@@ -84,6 +102,12 @@ export abstract class Type implements IType {
 
 export abstract class BasicType<T> implements IType {
    readonly type: TypeSet
+
+   get info(): TypeInfo {
+      return {
+         type: this.type
+      }
+   }
 
    constructor(type: TypeSet) {
       this.type = type

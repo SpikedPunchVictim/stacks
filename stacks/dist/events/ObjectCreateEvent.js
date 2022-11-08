@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ObjectCreateEvent = void 0;
+const Event_1 = require("./Event");
+class ObjectCreateEvent extends Event_1.Event {
+    constructor(model, object) {
+        super(Event_1.EventSet.ObjectCreated);
+        this.model = model;
+        this.object = object;
+    }
+}
+exports.ObjectCreateEvent = ObjectCreateEvent;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiT2JqZWN0Q3JlYXRlRXZlbnQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvZXZlbnRzL09iamVjdENyZWF0ZUV2ZW50LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7OztBQUVBLG1DQUEwQztBQUUxQyxNQUFhLGlCQUF5QyxTQUFRLGFBQUs7SUFDaEUsWUFBcUIsS0FBYSxFQUFXLE1BQVM7UUFDbkQsS0FBSyxDQUFDLGdCQUFRLENBQUMsYUFBYSxDQUFDLENBQUE7UUFEWCxVQUFLLEdBQUwsS0FBSyxDQUFRO1FBQVcsV0FBTSxHQUFOLE1BQU0sQ0FBRztJQUV0RCxDQUFDO0NBQ0g7QUFKRCw4Q0FJQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IFN0YWNrT2JqZWN0IH0gZnJvbSBcIi4uL1N0YWNrT2JqZWN0XCI7XG5pbXBvcnQgeyBJTW9kZWwgfSBmcm9tIFwiLi4vTW9kZWxcIjtcbmltcG9ydCB7IEV2ZW50LCBFdmVudFNldCB9IGZyb20gXCIuL0V2ZW50XCI7XG5cbmV4cG9ydCBjbGFzcyBPYmplY3RDcmVhdGVFdmVudDxUIGV4dGVuZHMgU3RhY2tPYmplY3Q+IGV4dGVuZHMgRXZlbnQge1xuICAgY29uc3RydWN0b3IocmVhZG9ubHkgbW9kZWw6IElNb2RlbCwgcmVhZG9ubHkgb2JqZWN0OiBUKSB7XG4gICAgICBzdXBlcihFdmVudFNldC5PYmplY3RDcmVhdGVkKVxuICAgfVxufSJdfQ==

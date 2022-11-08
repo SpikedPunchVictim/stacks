@@ -5,7 +5,7 @@ import { IOrchestrator } from "../orchestrator/Orchestrator";
 import { IStackContext } from "./StackContext";
 export interface IStackGet {
     /**
-     * Gets aModel by name
+     * Gets a Model by name
      *
      * @param name The name of the Model
      */

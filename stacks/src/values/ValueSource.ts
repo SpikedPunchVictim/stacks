@@ -144,7 +144,10 @@ export class ValueSource implements IValueSource {
             coercedItemType
          
          let list = new ListValue(itemType, context.serializer)
-         list.push(...array.map(it => ValueSource.resolve(it, context)))
+
+         if(itemType.type !== TypeSet.ObjectRef) {
+            list.push(...array.map(it => ValueSource.resolve(it, context)))            
+         }
    
          return list
       } else if (typeof source === 'string') {

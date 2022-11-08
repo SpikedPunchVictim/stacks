@@ -73,8 +73,10 @@ let handler = {
       field.edit = value
       return true
    },
-   ownKeys(target: IProxyObject): void[] {
-      return target.fields.map(f => f.name as string)
+   ownKeys(target: IProxyObject): string[] {
+      let fields: string[] = target.fields.map<string>(f => f.name as string)
+      fields.push("id")
+      return fields
    },
    getOwnPropertyDescriptor(target: IProxyObject, key: string) {
       let field = target.fields.get(key)

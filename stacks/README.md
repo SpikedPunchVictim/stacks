@@ -88,6 +88,13 @@ Soda.symbols.push(...[
    { name: 'dynamo:partitionKeyType', value: 'number' }
 ])
 
+let Vendor = await stack.create.model('vendor', {
+   soda: Soda,    // To set a reference to a Soda Type
+   anotherWayToSoda: ({ ref }) => ref(Soda.name),  // Same as the previous
+   sodas: [Soda], // To set a reference to an Array of Sodas
+
+})
+
 // Bootstrap is called after all Models have been created.
 // This allows Plugins to run any initialization code based
 // on the Models that have been defined in the Stack.
@@ -123,6 +130,7 @@ export enum EventSet {
    GetManyObjects = 'get-many-objects',
    GetModel = 'get-model',
    GetObject = 'get-object',
+   GetStoreContext = 'get-store-context',
    HasId = 'has-id',
    ModelCreated = 'model-created',
    ModelDeleted = 'model-deleted',
@@ -132,3 +140,10 @@ export enum EventSet {
    ObjectUpdated = 'object-updated',
    ObjectSaved = 'object-saved'
 }
+
+# Custom Queries
+
+Most likely there will come a time when you'll want to customize your queries outside of what `stacks` provides. You can set a custom Query Object
+on the `stack` that can be retrieved anywhere you need.
+
+Each `stack` has a `setQuery<T>(query: T): void` and `getQuery<T>(): T | undefined`

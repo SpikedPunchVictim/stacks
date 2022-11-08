@@ -1,3 +1,4 @@
+import { Model } from "../Model";
 import { IStackContext } from "../stack/StackContext";
 import { BoolType } from "./Bool";
 import { IntType } from "./Int";
@@ -75,8 +76,13 @@ export class TypeSource {
          return new ListType(itemType)
 
       } else if(typeof source === 'object') {
+         let model = Model.asModel(source)
+         if(model !== undefined) {
+            return new ObjectRefType(model.name, context)
+         }
+
          if(!Type.isType(source)) {
-            throw new Error(`Error resolving a Type. Expected a Type Obejct but received something else instead.`)
+            throw new Error(`Error resolving a Type. Expected a Type Object but received something else instead.`)
          }
 
          return source      

@@ -1,3 +1,4 @@
+import { IModel } from './Model';
 import { IStack } from './stack/Stack';
 /**
  * This class is responsible for generating IDs for the objects
@@ -12,7 +13,7 @@ export interface IUidKeeper {
     /**
      * Generates a unique ID
      */
-    generate(): Promise<string>;
+    generate(model: IModel): Promise<string>;
     /**
      * Generates an ID used locally. These are used for Model Members
      * where they are not expected to be consistent between runs.
@@ -22,8 +23,9 @@ export interface IUidKeeper {
      * Determines if an ID has already been reserved.
      *
      * @param id The ID to check
+     * @param modelId The associated Model ID
      */
-    has(id: string): Promise<boolean>;
+    has(id: string, model: IModel): Promise<boolean>;
     /**
      * Registers an ID with the UidKeeper. Registered IDs won't be used again
      *
@@ -44,9 +46,9 @@ export declare class UidKeeper implements IUidKeeper {
     private _stack;
     constructor();
     attach(stack: IStack): void;
-    generate(): Promise<string>;
+    generate(model: IModel): Promise<string>;
     generateLocal(): string;
-    has(id: string): Promise<boolean>;
+    has(id: string, model: IModel): Promise<boolean>;
     register(id: string): Promise<void>;
     unregister(id: string): Promise<void>;
 }

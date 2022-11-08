@@ -1,6 +1,7 @@
 import { Cache, ICache } from "../Cache"
 import { EventRouter, IEventRouter } from "../events/EventRouter"
 import { IRequestForChangeSource, RequestForChangeSource } from "../events/RequestForChange"
+import { IModel } from "../Model"
 import { CompositeSerializer, IValueSerializer } from "../serialize/ValueSerializer"
 import { IUidKeeper, UidKeeper } from "../UidKeeper"
 import { CombinedEventEmitter, ICombinedEventEmitter } from "../utils/Eventing"
@@ -22,6 +23,14 @@ export type StackOptions = {
    uidKeeper?: IUidKeeper
 }
 
+export type StoreContext = {
+   name: string
+   version: string
+   store: any
+}
+
+export type ApplyStoreContextHandler<T> = (contexts: StoreContext[]) => Promise<T>
+
 export interface IStack extends ICombinedEventEmitter {
    readonly create: IStackCreate
    readonly delete: IStackDelete
@@ -38,11 +47,26 @@ export interface IStack extends ICombinedEventEmitter {
    bootstrap(): Promise<void>
 
    /**
+    * Gets the Query object that has been set.
+    */
+   getQueryObject<T>(): T | undefined
+
+   /**
     * Determines if an id is already in use.
     * 
     * @param id The id
+    * @param model The associated Model
     */
-   hasId(id: string): Promise<boolean>
+   hasId(id: string, model: IModel): Promise<boolean>
+
+   /**
+    * Sets a custom Query object that can be used throughout an application,
+    * that extends the functionality that's built into Stacks.
+    * 
+    * @param query The custom Query Object
+    */
+   setQueryObject<T>(handler: ApplyStoreContextHandler<T>): Promise<void>
+
 
    /**
     * Adds a Plugin to the Stack
@@ -67,6 +91,7 @@ export class Stack
    private rfc: IRequestForChangeSource
    private context: StackContext
    private cache: ICache
+   private queryObject: any | undefined = undefined
 
    constructor(options?: StackOptions) {
       super()
@@ -103,11 +128,19 @@ export class Stack
       return this.context.orchestrator.boostrap()
    }
 
-   async use(plugin: IPlugin): Promise<void> {
-      await plugin.setup(this, this.router)
+   getQueryObject<T>(): T | undefined {
+       return this.queryObject as T
    }
 
-   async hasId(id: string): Promise<boolean> {
-      return this.context.orchestrator.hasId(id)
+   async hasId(id: string, model: IModel): Promise<boolean> {
+      return this.context.orchestrator.hasId(id, model)
+   }
+
+   async setQueryObject<T>(handler: ApplyStoreContextHandler<T>): Promise<void> {
+       this.queryObject = await this.context.orchestrator.storeQueryObject(handler)
+   }
+
+   async use(plugin: IPlugin): Promise<void> {
+      await plugin.setup(this, this.router)
    }
 }

@@ -1,4 +1,4 @@
-import { IMemberCollection, MemberCollection } from "./collections/MemberCollection";
+import { IMemberCollection, MemberCollection, NoOpMemberCollection } from "./collections/MemberCollection";
 import { IOrchestrator } from "./orchestrator/Orchestrator";
 import { IStackContext } from "./stack/StackContext";
 import { ValidationReport } from "./values/Type";
@@ -6,6 +6,7 @@ import { CreateValueHandler, ValueCreateParams } from "./values/ValueSource";
 import { StackObject } from "./StackObject";
 import { IValueSerializer } from "./serialize/ValueSerializer";
 import { MemberInfo } from "./Member";
+import { UidKeeper } from "./UidKeeper";
 
 /**
  * The parameters used to create an Object based on a Model.
@@ -100,10 +101,70 @@ export interface IModel {
    validate<T>(obj: T): Promise<ValidationReport>
 }
 
+export class NoOpModel implements IModel {
+   readonly id: string = 'empty-object-not-a-valid-model'
+   readonly name: string = 'empty-object-not-a-valid-model'
+
+   readonly members: IMemberCollection
+   readonly symbols: SymbolEntry[] = new Array<SymbolEntry>()
+
+   constructor() {
+      this.members = new NoOpMemberCollection()
+   }
+
+   append(obj: ModelCreateParams): Promise<void> {
+      throw new Error(`Not Implemented`)
+   }
+
+   save<T extends StackObject>(object: T): Promise<void> {
+      throw new Error(`Not Implemented`)
+   }
+
+   create<T extends StackObject>(obj?: ObjectCreateParams): Promise<T> {
+      {
+         throw new Error(`Not Implemented`)
+      }
+   }
+
+   delete<T extends StackObject>(object: T): Promise<void> {
+      throw new Error(`Not Implemented`)
+   }
+
+   get<T extends StackObject>(id: string): Promise<T | undefined> {
+      throw new Error(`Not Implemented`)
+   }
+
+   getAll<T extends StackObject>(): Promise<T[]> {
+      throw new Error(`Not Implemented`)
+   }
+
+   getMany<T extends StackObject>(req?: PageRequest): Promise<PageResponse<T>> {
+      throw new Error(`Not Implemented`)
+   }
+
+   toJs<T>(): Promise<T> {
+      throw new Error(`Not Implemented`)
+   }
+
+   validate<T>(obj: T): Promise<ValidationReport> {
+      throw new Error(`Not Implemented`)
+   }
+}
+
 export class Model implements IModel {
-   readonly id: string
+   get id(): string {
+      return this._id
+   }
+
    readonly name: string
    readonly context: IStackContext
+
+   readonly members: IMemberCollection
+   readonly symbols: SymbolEntry[]
+
+   static get NoOp(): IModel {
+      return this._noop
+   }
 
    private get orchestrator(): IOrchestrator {
       return this.context.orchestrator
@@ -111,18 +172,50 @@ export class Model implements IModel {
 
    private get serializer(): IValueSerializer {
       return this.context.serializer
-   }   
+   }
 
-   readonly members: IMemberCollection
-   readonly symbols: SymbolEntry[]
+   private static _noop: IModel = new NoOpModel()
+   private _id: string = UidKeeper.IdNotSet
 
-   constructor(name: string, id: string, context: IStackContext) {
+   private constructor(name: string, context: IStackContext) {
       this.name = name
-      this.id = id
       this.context = context
 
       this.members = new MemberCollection(this, this.context)
       this.symbols = new Array<SymbolEntry>()
+   }
+
+   static async create(name: string, context: IStackContext): Promise<IModel> {
+      let model = new Model(name, context)
+      model.setId(await context.uid.generate(model))
+      return model
+   }
+
+   static isModel(obj: any): boolean {
+      for (let key of Object.keys(Model.NoOp)) {
+         if (obj[key] == null ||
+            (typeof obj[key] !== typeof Model.NoOp[key])
+         ) {
+            return false
+         }
+      }
+
+      return true
+   }
+
+   /**
+    * Determines if an Object is a Model. If it is, then it will return a
+    * cast value of the Model, otherwise undefined.
+    * 
+    * @param obj The Object to cast
+    * @returns 
+    */
+   static asModel(obj: any): IModel | undefined {
+      if(Model.isModel(obj)) {
+         return obj as IModel
+      }
+
+      return undefined
    }
 
    async append(obj: ModelCreateParams): Promise<void> {
@@ -148,12 +241,12 @@ export class Model implements IModel {
    async getAll<T extends StackObject>(): Promise<T[]> {
       let cursor = ''
       let results = new Array<T>()
-      
+
       do {
          let paged = await this.orchestrator.getManyObjects<T>(this, { cursor })
          results.push(...paged.items)
          cursor = paged.cursor
-      } while(cursor !== '')
+      } while (cursor !== '')
 
       return results
    }
@@ -194,5 +287,9 @@ export class Model implements IModel {
       }
 
       return report
+   }
+
+   private setId(id: string): void {
+      this._id = id
    }
 }

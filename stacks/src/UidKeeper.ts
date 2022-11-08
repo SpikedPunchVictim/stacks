@@ -1,4 +1,5 @@
 import { uid } from 'uid/secure'
+import { IModel } from './Model'
 import { IStack } from './stack/Stack'
 
 /**
@@ -15,7 +16,7 @@ export interface IUidKeeper {
    /**
     * Generates a unique ID
     */
-   generate(): Promise<string>
+   generate(model: IModel): Promise<string>
 
    /**
     * Generates an ID used locally. These are used for Model Members
@@ -27,8 +28,9 @@ export interface IUidKeeper {
     * Determines if an ID has already been reserved.
     * 
     * @param id The ID to check
+    * @param modelId The associated Model ID
     */
-   has(id: string): Promise<boolean>
+   has(id: string, model: IModel): Promise<boolean>
 
    /**
     * Registers an ID with the UidKeeper. Registered IDs won't be used again
@@ -63,10 +65,10 @@ export class UidKeeper implements IUidKeeper {
       this._stack = stack
    }
 
-   async generate(): Promise<string> {
+   async generate(model: IModel): Promise<string> {
       let id = uid(32)
 
-      while(await this.has(id)) {
+      while(await this.has(id, model)) {
          id = uid(32)
       }
 
@@ -77,12 +79,12 @@ export class UidKeeper implements IUidKeeper {
       return uid(32)
    }
 
-   async has(id: string): Promise<boolean> {
+   async has(id: string, model: IModel): Promise<boolean> {
       if(this.ids.indexOf(id) >= 0) {
          return true
       }
 
-      return this.stack === undefined ? false : await this.stack.hasId(id)
+      return this.stack === undefined ? false : await this.stack.hasId(id, model)
    }
 
 

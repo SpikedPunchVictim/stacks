@@ -1,26 +1,31 @@
 import { StackObject } from "../StackObject";
 import { ICache } from "../Cache";
-import { GetObjectEvent } from "../events";
-import { SaveObjectEvent } from "../events/SaveObjectEvent";
-import { DeleteObjectEvent } from "../events/DeleteObjectEvent";
-import { EventSet, ExistState } from "../events/Event";
-import { GetManyObjectsEvent } from "../events/GetManyObjectsEvent";
-import { HasIdEvent } from "../events/HasIdEvent";
-import { IRequestForChangeSource } from "../events/RequestForChange";
-import { UpdateObjectEvent } from "../events/UpdateObjectEvent";
 import { IModel, Model, ModelCreateParams, ObjectCreateParams, PageRequest, PageResponse } from "../Model";
-import { IStack } from "../stack/Stack";
+import { ApplyStoreContextHandler, IStack } from "../stack/Stack";
 import { IStackContext } from "../stack/StackContext";
 import { UpdateObjectHandler } from "../stack/StackUpdate";
 import { ProxyObject } from "../ProxyObject";
 import { IUidKeeper, UidKeeper } from "../UidKeeper";
 import { IValueSerializer } from "../serialize/ValueSerializer";
-import { CreateObjectEvent } from "../events/CreateObjectEvent";
-import { CreateModelEvent } from "../events/CreateModelEvent";
-import { DeleteModelEvent } from "../events/DeleteModelEvent";
-import { GetModelEvent } from "../events/GetModelEvent";
-import { BootstrapEvent } from "../events/BootstrapEvent";
 
+import {
+   BootstrapEvent,
+   ModelCreateEvent,
+   ObjectCreateEvent,
+   ModelDeleteEvent,
+   ObjectDeleteEvent,
+   EventSet,
+   ExistState,
+   GetManyObjectsEvent,
+   GetModelEvent,
+   GetObjectEvent,
+   GetStoreContextEvent,
+   HasIdEvent,
+   IRequestForChangeSource,
+   ObjectSaveEvent,
+   ObjectUpdateEvent,
+   ModelUpdateEvent
+} from '../events'
 export interface IOrchestrator {
    // TODO: Add: createModel, deleteModel (these should assist in running tests)
 
@@ -104,15 +109,25 @@ export interface IOrchestrator {
     * Determines if an ID is already in use.
     * 
     * @param id The ID to test
+    * @param model The associated Model
     */
-   hasId(id: string): Promise<boolean>
+   hasId(id: string, model: IModel): Promise<boolean>
    
    /**
-    * Updates the values of an Object
+    * Creates and stores a custom Query Object
     * 
-    * @param model The Model of the Object
-    * @param obj The Object to update
-    * @param onUpdate Handler that is called after an Object has been updated
+    * @param handler The handler to create the custom Query Object
+    */
+    storeQueryObject<T>(handler: ApplyStoreContextHandler<T>): Promise<T | undefined>
+
+   /**
+    * Updates an already existing object with the latest from the stored version.
+    * This method is intended to be used on long lived objects where we want them
+    * to be updated locally, and not saved.
+    * 
+    * @param model The Model
+    * @param obj The Object
+    * @param onUpdate Function to update the Object based on the latest version
     */
    updateObject<T extends StackObject>(model: IModel, obj: T, onUpdate: UpdateObjectHandler<T>): Promise<void>
 }
@@ -158,14 +173,12 @@ export class Orchestrator implements IOrchestrator {
          throw new Error(`A Model with the name ${name} already exists`)
       }
 
-      let id = await this.uid.generate()
-
-      model = new Model(name, id, this.context)
+      model = await Model.create(name, this.context)
       await model.append(params)
 
       this.cache.saveModel(model)
 
-      await this.rfc.create(new CreateModelEvent(model))
+      await this.rfc.create(new ModelCreateEvent(model))
          .fulfill(async (event) => {
             await this.stack.emit(EventSet.ModelCreated, event)
          })
@@ -175,7 +188,7 @@ export class Orchestrator implements IOrchestrator {
    }
 
    async deleteModel(model: IModel): Promise<void> {
-      await this.rfc.create(new DeleteModelEvent(model))
+      await this.rfc.create(new ModelDeleteEvent(model))
          .fulfill( async (event) => {
             this.cache.deleteModel(model.name)
          })
@@ -192,7 +205,7 @@ export class Orchestrator implements IOrchestrator {
       await this.rfc.create(new GetModelEvent(name))
          .fulfill(async (event) => {
             let getModel = event as GetModelEvent
-            model = getModel.model
+            model = getModel.model || this.cache.getModel(name)
 
             if(model !== undefined) {
                this.cache.saveModel(model)
@@ -206,13 +219,18 @@ export class Orchestrator implements IOrchestrator {
    }
 
    async updateModel(model: IModel, params: ModelCreateParams): Promise<void> {
-
+      this.rfc.create(new ModelUpdateEvent(model))
+         .fulfill(async (event) => {
+            let updateModelEvent = event as ModelUpdateEvent
+            this.cache.saveModel(updateModelEvent.model)
+         })
+         .commit()
    }
 
    async createObject<T extends StackObject>(model: IModel, params: ObjectCreateParams): Promise<T> {
       let created = await ProxyObject.fromCreated<T>(model, params, this.context) as T
 
-      await this.rfc.create(new CreateObjectEvent(model, created))
+      await this.rfc.create(new ObjectCreateEvent(model, created))
          .fulfill(async (event) => {
             await this.stack.emit(EventSet.ObjectCreated, event)
          })
@@ -228,7 +246,7 @@ export class Orchestrator implements IOrchestrator {
     */
    async saveObject<T extends StackObject>(model: IModel, obj: T): Promise<void> {
       if(obj.id === UidKeeper.IdNotSet) {
-         obj.id = await this.uid.generate()
+         obj.id = await this.uid.generate(model)
       }
       
       let validations = await model.validate(obj)
@@ -240,7 +258,7 @@ export class Orchestrator implements IOrchestrator {
       //@ts-ignore
       let serialized = ProxyObject.unwrap(obj)
 
-      await this.rfc.create(new SaveObjectEvent<T>(model, obj, serialized))
+      await this.rfc.create(new ObjectSaveEvent<T>(model, obj, serialized))
          .fulfill(async (event) => {
             this.cache.saveObject(model, obj)
             await this.stack.emit(EventSet.ObjectSaved, event)
@@ -289,7 +307,7 @@ export class Orchestrator implements IOrchestrator {
                if (items.length == limit && objects.length > limit) {
                   results.cursor = Buffer.from(objects[limit].id).toString('base64')
                } else {
-                  // If there are no more entries in thenext set, we default the cursor
+                  // If there are no more entries in the next set, we default the cursor
                   // to empty string
                   results.cursor = ''
                }
@@ -330,7 +348,7 @@ export class Orchestrator implements IOrchestrator {
    }
 
    async deleteObject<T extends StackObject>(model: IModel, obj: T): Promise<void> {
-      await this.rfc.create(new DeleteObjectEvent(model, obj))
+      await this.rfc.create(new ObjectDeleteEvent(model, obj))
          .fulfill(async (event) => {
             this.cache.deleteObject(model, obj)
             await this.stack.emit(EventSet.ObjectDeleted, event)
@@ -365,10 +383,10 @@ export class Orchestrator implements IOrchestrator {
       return object
    }
 
-   async hasId(id: string): Promise<boolean> {
+   async hasId(id: string, model: IModel): Promise<boolean> {
       let hasId = false
 
-      await this.rfc.create(new HasIdEvent(id))
+      await this.rfc.create(new HasIdEvent(id, model))
          .fulfill(async (event) => {
             let cast = event as HasIdEvent
 
@@ -395,6 +413,20 @@ export class Orchestrator implements IOrchestrator {
       return hasId
    }
 
+   async storeQueryObject<T>(handler: ApplyStoreContextHandler<T>): Promise<T | undefined> {
+      let result: T | undefined = undefined
+
+      await this.rfc.create(new GetStoreContextEvent())
+         .fulfill(async (event) => {
+            let getStoreContext = event as GetStoreContextEvent
+
+            result = await handler(getStoreContext.contexts)
+         })
+         .commit()
+
+      return result
+   }
+
    /**
     * Updates an already existing object with the latest from the stored version.
     * This method is intended to be used on long lived objects where we want them
@@ -405,9 +437,9 @@ export class Orchestrator implements IOrchestrator {
     * @param onUpdate Function to update the Object based on the latest version
     */
    async updateObject<T extends StackObject>(model: IModel, obj: T, onUpdate: UpdateObjectHandler<T>): Promise<void> {
-      await this.rfc.create(new UpdateObjectEvent<T>(model, obj, ProxyObject.unwrap(obj)))
+      await this.rfc.create(new ObjectUpdateEvent<T>(model, obj, ProxyObject.unwrap(obj)))
          .fulfill(async (event) => {
-            let cast = event as UpdateObjectEvent<T>
+            let cast = event as ObjectUpdateEvent<T>
 
             let updated = cast.updated
 

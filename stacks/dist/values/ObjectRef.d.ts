@@ -1,12 +1,13 @@
 import { IOrchestrator } from "../orchestrator/Orchestrator";
 import { ValueSerializer } from "../serialize/ValueSerializer";
 import { IStackContext } from "../stack/StackContext";
-import { IType, Type, ValidateResult } from "./Type";
+import { IType, Type, TypeInfo, ValidateResult } from "./Type";
 import { IValue, Value } from "./Value";
 export declare class ObjectRefType extends Type {
     readonly modelName: string;
     readonly context: IStackContext;
     get orchestrator(): IOrchestrator;
+    get info(): TypeInfo;
     constructor(modelName: string, context: IStackContext);
     equals(other: IType): boolean;
     validate<T>(obj: T): Promise<ValidateResult>;

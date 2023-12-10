@@ -21,13 +21,17 @@ export class StoredObject {
             .where('id', '=', id)
             .execute()
 
-         console.log(`:: From DB`)
+         if(result.length === 0) {
+            return undefined
+         }
+
+         console.log(":: From DB")
          console.dir(result[0], { depth: null })
 
-         console.log(`:: Transformed`)
+         console.log(":: Transformed")
          console.dir(context.fromDbObj(model.name, result[0] as any), { depth: null })
          
-         return result.length == 0 ? undefined : new StoredObject(model, result[0] as StackObject, context)
+         return result.length === 0 ? undefined : new StoredObject(model, result[0] as StackObject, context)
       } catch (err) {
          throw err
       }
@@ -46,6 +50,37 @@ export class StoredObject {
    static create(model: IModel, obj: StackObject, context: PluginContext): StoredObject {
       let dbObj = context.toDbObj(model.name, obj)
       return new StoredObject(model, dbObj, context)
+   }
+
+   static async delete(model: IModel, id: string, context: PluginContext): Promise<void> {
+      let info = context.getTable(model)
+
+      if (info === undefined) {
+         throw new StacksPostgresError(`Could not match Model with a Table when saving Object ${id}`)
+      }
+
+      try {
+         await context.db
+            .deleteFrom(info.tableName)
+            .where('id', '=', id)
+            .execute()
+      } catch (err) {
+         console.error(`[stacks-postgres] Failed to delete an Object from Postgres. Model ${model.name}, Object ID ${id}. Reason: ${err}`)
+         throw err
+      }
+   }
+
+   static async update(model: IModel, obj: StackObject, context: PluginContext): Promise<void> {
+      let table = context.getTable(model)
+
+      if (table === undefined) {
+         throw new StacksPostgresError(`Failed to find the Table for Model ${model.name}. Ensure the Postgres Plugin has been properly initialized.`)
+      }
+
+      await context.db.updateTable(table.tableName)
+         .where('id', '=', obj.id)
+         .set(obj)
+         .execute()
    }
 
    async save(): Promise<void> {
@@ -85,6 +120,8 @@ export class StoredObject {
          savedObj[colName]= this.obj[colName]
       }
 
+      savedObj['id'] = this.obj.id
+
       let result = await this.context.db
          .insertInto(table.tableName)
          .values(savedObj)
@@ -96,20 +133,6 @@ export class StoredObject {
    }
 
    async delete(): Promise<void> {
-      let info = this.context.getTable(this.model)
-
-      if (info == undefined) {
-         throw new StacksPostgresError(`Could not match Model with a Table when saving Object ${this.obj.id}`)
-      }
-
-      try {
-         await this.context.db
-            .deleteFrom(info.tableName)
-            .where('id', '=', this.obj.id)
-            .execute()
-      } catch (err) {
-         console.error(`[stacks-postgres] Failed to delete an Object from Postgres. Model ${this.model.name}, Object ID ${this.obj.id}. Reason: ${err}`)
-         throw err
-      }
+      await StoredObject.delete(this.model, this.obj.id, this.context)
    }
 }

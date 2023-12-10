@@ -6,6 +6,8 @@ import { Client } from 'pg'
 import {
    BootstrapEvent,
    EventSet,
+   ExistState,
+   GetManyObjectsEvent,
    GetObjectEvent,
    GetStoreContextEvent,
    HasIdEvent,
@@ -14,7 +16,9 @@ import {
    IModel,
    IPlugin,
    IStack,
+   ObjectDeleteEvent,
    ObjectSaveEvent,
+   ObjectUpdateEvent,
    StackObject,
    TypeInfo,
    TypeSet
@@ -55,6 +59,7 @@ export class PostgresPlugin implements IPlugin {
    private context: PluginContext
 
    constructor(readonly config: PostgresConfig) {
+      config.pageLimit = config.pageLimit || 100
       this.context = new PluginContext(config)
    }
 
@@ -124,15 +129,15 @@ export class PostgresPlugin implements IPlugin {
 
   }
 
-      Bootstrap = 'bootstrap',
-      GetObject = 'get-object',
+      - Bootstrap = 'bootstrap',
+      - GetObject = 'get-object',
       GetManyObjects = 'get-many-objects',
-      GetStoreContext = 'get-store-context',
-      HasId = 'has-id',
-      ObjectCreated = 'object-created',
-      ObjectDeleted = 'object-deleted',
+      - GetStoreContext = 'get-store-context',
+      - HasId = 'has-id',
+      X ObjectCreated = 'object-created' (Don't need this),
+      - ObjectDeleted = 'object-deleted',
       ObjectUpdated = 'object-updated',
-      ObjectSaved = 'object-saved'
+      - ObjectSaved = 'object-saved'
      */
 
    async setup(stack: IStack, router: IEventRouter): Promise<void> {
@@ -200,7 +205,8 @@ export class PostgresPlugin implements IPlugin {
             version: this.version || 'version-not-set',
             store: {
                config: this.config,
-               db: this.context.db
+               db: this.context.db,
+               tables: Array.from(this.context.tableMap.values())
             }
          })
       })
@@ -212,72 +218,56 @@ export class PostgresPlugin implements IPlugin {
 
             console.dir(found, { depth: null })
 
-            // if (result.length === 0) {
-            //    event.exists = ExistState.DoesNotExist
-            //    return
-            // }
-            //event.object = result.
+            if(found === undefined) {
+               event.exists = ExistState.DoesNotExist
+            } else {
+               event.object = found.obj
+            }
          } catch (err) {
             throw err
          }
       })
 
       //-------------------------------------------------------------------------------------------
-      // router.on<GetManyObjectsEvent<StackObject>>(EventSet.GetManyObjects, async (event: GetManyObjectsEvent<StackObject>) => {
-      //    let modelDir = this.getModelDir(event.model.name)
-      //    let reqCursor = event.options.cursor || ''
-      //    let reqCount = event.options.limit == null ? 100 : event.options.limit
+      router.on<GetManyObjectsEvent<StackObject>>(EventSet.GetManyObjects, async (event: GetManyObjectsEvent<StackObject>) => {
+         let tableInfo = this.context.getTable(event.model)
 
-      //    // Ignore any Temp files that may be in the directory
-      //    let files = await fs.readdir(modelDir)
-      //    files = files.filter(it => path.parse(it).ext !== TempFileExt)
-      //    files.sort()
+         if(tableInfo === undefined) {
+            throw new StacksPostgresError(`Failed to find the table for Model "${event.model.name}" when performing an Object search`)
+         }
 
-      //    let cursor = ''
-      //    let startIndex = 0
-      //    let requestedFiles = new Array<string>()
+         if(event.page.cursor == null || event.page.cursor === '') {
+            let limit = event.page.limit || this.config.pageLimit || 100
+            
+            let objs = await this.context.db
+               .selectFrom(tableInfo.tableName)
+               .orderBy('id')
+               .limit(limit)
+               .execute() as StackObject[]            
 
-      //    // The cursor becomes the next file one in the sorted list
-      //    if (reqCursor !== '') {
-      //       let names = files.map(f => path.parse(f).name)
+            if(objs.length === 0) {
+               event.results = {
+                  cursor: '',
+                  items: []
+               }
+               
+               return
+            }
 
-      //       let decodedCursor = Buffer.from(reqCursor, 'base64').toString('ascii')
-      //       let found = names.findIndex(it => it === decodedCursor)
+            let lastObj = objs[objs.length - 1]
 
-      //       if (found < 0) {
-      //          found = 0
-      //          event.wasCursorFound = false
-      //       } else {
-      //          startIndex = found
-      //       }
-      //    }
+            event.results = {
+               cursor: Buffer.from(lastObj.id).toString('base64'),
+               items: objs.map(obj => this.context.fromDbObj(event.model.name, obj))
+            }
+         }
 
-      //    let endIndex = reqCount + startIndex
-      //    requestedFiles = files.slice(startIndex, endIndex)
-
-      //    if (endIndex < (files.length - 1)) {
-      //       let parsed = path.parse(path.join(this.baseDir, files[endIndex]))
-      //       cursor = parsed.name
-      //    } else {
-      //       cursor = ''
-      //    }
-
-      //    let objects = new Array<StackObject>()
-
-      //    for (let file of requestedFiles) {
-      //       objects.push(await fs.readJson(path.join(modelDir, file)))
-      //    }
-
-      //    event.results = {
-      //       cursor: cursor === '' ? '' : Buffer.from(cursor).toString('base64'),
-      //       items: objects
-      //    }
-      // })
+      })
 
       //-------------------------------------------------------------------------------------------
       router.on<ObjectSaveEvent<StackObject>>(EventSet.ObjectSaved, async (event: ObjectSaveEvent<StackObject>) => {
          try {
-            let storedObj = await StoredObject.create(event.model, event.object, this.context)
+            let storedObj = await StoredObject.getOrCreate(event.model, event.object, this.context)
             await storedObj.save()
          } catch (err) {
             console.dir(err)
@@ -285,64 +275,39 @@ export class PostgresPlugin implements IPlugin {
          }
       })
 
+      //-------------------------------------------------------------------------------------------
+      router.on<GetObjectEvent<StackObject>>(EventSet.GetObject, async (event: GetObjectEvent<StackObject>) => {
+         try {
+            let stored = await StoredObject.fromId(event.model, event.id, this.context)
+
+            if(stored === undefined) {
+               event.exists = ExistState.DoesNotExist
+               return
+            }
+
+            event.object = stored.obj
+         } catch (err) {
+            throw new Error(`[stacks-fs] Failed to retrieve Object ${event.id}. Reason ${err}`)
+         }
+      })
+
+      //-------------------------------------------------------------------------------------------
+      router.on<ObjectDeleteEvent<StackObject>>(EventSet.ObjectDeleted, async (event: ObjectDeleteEvent<StackObject>) => {
+         try {
+            await StoredObject.delete(event.model, event.object.id, this.context)
+         } catch (err) {
+            throw new StacksPostgresError(`Failed to delete an Object ${event.object.id}. Reason ${err}`)
+         }
+      })
+
       // //-------------------------------------------------------------------------------------------
-      // router.on<GetObjectEvent<StackObject>>(EventSet.GetObject, async (event: GetObjectEvent<StackObject>) => {
-      //    let objectPath = this.getObjectPath(event.model.id, event.id)
-
-      //    try {
-      //       let obj = await fs.readJson(objectPath)
-      //       event.object = obj
-      //    } catch (err) {
-      //       throw new Error(`[stacks-fs] Failed to retrieve Object ${event.id}. Reason ${err}`)
-      //    }
-      // })
-
-      // //-------------------------------------------------------------------------------------------
-      // router.on<DeleteObjectEvent<StackObject>>(EventSet.ObjectDeleted, async (event: DeleteObjectEvent<StackObject>) => {
-      //    let objectPath = this.getObjectPath(event.model.name, event.object.id)
-
-      //    try {
-      //       await fs.remove(objectPath)
-      //    } catch (err) {
-      //       throw new Error(`[stacks-fs] Failed to delete an Object ${event.object.id}. Reason ${err}`)
-      //    }
-      // })
-
-      // //-------------------------------------------------------------------------------------------
-      // router.on<UpdateObjectEvent<StackObject>>(EventSet.ObjectUpdated, async (event: UpdateObjectEvent<StackObject>) => {
-      //    let objectPath = this.getObjectPath(event.model.name, event.object.id)
-      //    let tempPath = `${objectPath}${TempFileExt}`
-
-      //    try {
-      //       await fs.access(objectPath)
-
-      //       event.exists = ExistState.Exists
-
-      //       // We ensure we always have a copy of the original until we're done writing
-      //       // the changed file. We remove the copy if the write is sucessful, otherwise
-      //       // we rollback the change and keep the copy.
-      //       await fs.copy(objectPath, tempPath)
-      //       await fs.remove(objectPath)
-      //       await fs.writeJson(objectPath, event.serialize.toJs(), { spaces: 2 })
-      //       event.updated = 
-      //    } catch (err) {
-      //       try {
-      //          await fs.access(tempPath)
-      //          await fs.move(tempPath, objectPath, { overwrite: true })
-      //       } catch (err) {
-      //          // swallow
-      //       }
-
-      //       throw new Error(`[stacks-fs] Failed to update an Object ${event.object.id}. Reason ${err}`)
-      //    } finally {
-      //       try {
-      //          await fs.access(tempPath)
-      //          await fs.remove(tempPath)
-      //       } catch (err) {
-      //          // swallow
-      //       }
-      //    }
-      // })
+      router.on<ObjectUpdateEvent<StackObject>>(EventSet.ObjectUpdated, async (event: ObjectUpdateEvent<StackObject>) => {
+         try {
+            await StoredObject.update(event.model, event.serialize.toJs(), this.context)
+         } catch (err) {
+            throw new Error(`[stacks-fs] Failed to update an Object ${event.object.id}. Reason ${err}`)
+         }
+      })
    }
 
    private async bootstrapDb(stack: IStack): Promise<void> {
@@ -354,6 +319,30 @@ export class PostgresPlugin implements IPlugin {
 
       for (let model of stack.get.models()) {
          await this.createTable(model)
+      }
+
+      await this.buildSearchIndexes()
+   }
+
+   private async buildSearchIndexes(): Promise<void> {
+      for(let info of this.context.tableMap.values()) {
+         let tableInfo = await this.context.db
+            .selectFrom('pg_indexes')
+            .selectAll()
+            .where('tablename' , '=', info.tableName)
+            .execute()
+
+         let found = tableInfo.find(it => it.indexname === info.indexes.id)
+
+         if(found) {
+            continue
+         }
+
+         await this.context.db.schema
+            .createIndex(info.indexes.id)
+            .on(info.tableName)
+            .column('id')
+            .execute()
       }
    }
 
@@ -378,7 +367,7 @@ export class PostgresPlugin implements IPlugin {
             let columnConfig = this.symbols.getMemberSymbols<MemberSymbols>(model.id, member.id)
 
             if (columnConfig === undefined) {
-               throw new Error(`Failed to find any Symbols for MEmber ${member.name} in Model ${model.name}`)
+               throw new Error(`Failed to find any Symbols for Member ${member.name} in Model ${model.name}`)
             }
 
             let obj = await this.createColumn(member, columnConfig, builder)

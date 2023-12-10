@@ -82,7 +82,7 @@ async function main() {
    await Sword.save(iceSword)
    await Sword.save(fireSword)
 
-   let count = 3
+   let count = 300
 
    for(let i = 0; i < count; ++i) {
       let sword = await Sword.create({

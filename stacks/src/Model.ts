@@ -272,6 +272,10 @@ export class Model implements IModel {
       let report = new ValidationReport()
 
       for (let key of Object.keys(obj)) {
+         if(key === 'id') {
+            continue
+         }
+
          let member = this.members.get(key)
 
          if (member === undefined) {

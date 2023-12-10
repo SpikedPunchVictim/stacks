@@ -19,6 +19,8 @@ export class PluginContext {
       return this._tableMap
    }
 
+   // Key: Model Name
+   // Value: TableInfo
    private _tableMap: Map<string, TableInfo> = new Map<string, TableInfo>()
 
    constructor(readonly config: PostgresConfig) {
@@ -33,7 +35,8 @@ export class PluginContext {
                password: config.password
             })
          }),
-         log: ['query', 'error']
+         // Add 'query' to debug the queries
+         log: ['error']
       })
    }
 
@@ -77,7 +80,10 @@ export class PluginContext {
          cache.set(model.name.toLowerCase(), {
             model,
             tableName: tableConfig.tablename,
-            columns
+            columns,
+            indexes: {
+               id: `${tableConfig.tablename}_id_idx`
+            }
          })
       }
 
@@ -153,6 +159,8 @@ export class PluginContext {
          result[col.member.name] = dbObj[col.columnName]
       }
 
+      result['id'] = dbObj['id']
+
       return result
    }
 
@@ -175,6 +183,8 @@ export class PluginContext {
       for (let col of info.columns) {
          result[col.columnName] = object[col.member.name]
       }
+
+      result['id'] = object['id']
 
       return result
    }

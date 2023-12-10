@@ -65,7 +65,7 @@ export class Member implements IMember {
 
          let id = context.uid.generateLocal()
 
-         if(createContext != null && createContext.model != null) {
+         if(createContext?.model != null) {
             let model = createContext.model
             
             let found = model.members.find(m => m.id === id)

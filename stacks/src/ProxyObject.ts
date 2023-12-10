@@ -79,6 +79,14 @@ let handler = {
       return fields
    },
    getOwnPropertyDescriptor(target: IProxyObject, key: string) {
+      if(key === 'id') {
+         return {
+            configurable: true,
+            enumerable: true,
+            value: target.id
+         }
+      }
+
       let field = target.fields.get(key)
 
       if(field === undefined) {

@@ -6,6 +6,7 @@ import { PredicateHandler, VisitHandler } from "./Handlers";
 
 export interface IMemberCollection {
    readonly model: IModel
+   readonly length: number
 
    [Symbol.iterator](): Iterator<IMember>
 
@@ -26,6 +27,10 @@ export interface IMemberCollection {
 
 export class NoOpMemberCollection implements IMemberCollection {
    model: IModel;
+
+   get length(): number {
+      throw new Error("Method not implemented.");
+   }
 
    constructor() {
       this.model = Model.NoOp
@@ -59,11 +64,15 @@ export class MemberCollection implements IMemberCollection {
    readonly model: IModel
    readonly context: IStackContext
 
+   get length(): number {
+      return this.members.length
+   }
+
    get uid(): IUidKeeper {
       return this.context.uid
    }
 
-   private members: Array<IMember>
+   private members: IMember[]
 
    constructor(model: IModel, context: IStackContext) {
       this.model = model

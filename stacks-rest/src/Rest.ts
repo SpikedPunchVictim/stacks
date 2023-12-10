@@ -216,7 +216,7 @@ export class StacksRest {
          this.router.put(`${urlPath}/:id`, async (ctx: Koa.Context) => {
             let body = ctx.request.body
 
-            if (!body) {
+            if (body == null || typeof body !== 'object') {
                ctx.throw(400, `A body must be provided`)
                return
             }

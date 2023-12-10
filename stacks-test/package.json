@@ -1,26 +1,22 @@
 {
-  "name": "@spikedpunch/stacks-postgres",
+  "name": "@spikedpunch/stacks-test",
   "version": "0.0.1",
-  "description": "",
+  "description": "Test framework for stacks projects",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "author": "William Hoopes",
   "license": "ISC",
+  "dependencies": {
+    "@spikedpunch/stacks": "~0.0.1"
+  },
   "devDependencies": {
     "@types/node": "~16.11.12",
     "rimraf": "~3.0.2",
     "ts-node": "~10.4.0",
     "typescript": "~4.5.3",
-    "@spikedpunch/stacks-test": "~0.0.1"
-  },
-  "dependencies": {
-    "@spikedpunch/stacks": "~0.0.1",
-    "kysely": "~0.22.0",
-    "fs-extra": "~10.1.0",
-    "pg": "~8.8.0"
+    "chai": "~4.3.7"
   }
 }

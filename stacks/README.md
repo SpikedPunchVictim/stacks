@@ -92,7 +92,6 @@ let Vendor = await stack.create.model('vendor', {
    soda: Soda,    // To set a reference to a Soda Type
    anotherWayToSoda: ({ ref }) => ref(Soda.name),  // Same as the previous
    sodas: [Soda], // To set a reference to an Array of Sodas
-
 })
 
 // Bootstrap is called after all Models have been created.
@@ -116,6 +115,28 @@ await coke.save()
 coke = await Soda.get(coke.id)
 ```
 
+# Models
+
+**Creating Models**
+
+When creating Models, a unique name is passed in, as well as the set of parameters. The values that are set when creating the Model, become the default values for any Objects that are created from them.
+
+When setting the values for a Model, the system needs to know the Type and Value that is being set. For `string`, `number`, `boolean`, `Stacks` can infer the Type. For more complex Objects, like References to other Models, we need to specify the Type and Value.
+
+```js
+let model = await stack.ctreate.model('name', {
+   // The Type information can be infered on these Types
+   string: `I'm a string`,
+   int: -1,
+   uint: 12,
+   bool: true,
+   // Arrays
+   stringArray: ['']    // TODO: Need a better way to set default arrays
+   // consider
+   stringArray: ({ string }) => [string]
+})
+
+```
 
 
 # Events

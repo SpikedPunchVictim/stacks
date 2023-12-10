@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.77% </span>
+                <span class="strong">85.91% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>68/71</span>
+                <span class='fraction'>61/71</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.66% </span>
+                <span class="strong">70% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>11/12</span>
+                <span class='fraction'>7/10</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.77% </span>
+                <span class="strong">85.91% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>68/71</span>
+                <span class='fraction'>61/71</span>
             </div>
         
             
@@ -172,38 +172,38 @@
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">5x</span></td><td class="text"><pre class="prettyprint lang-js">import { IStack, Stack, StackObject, TypeSet } from "../src";
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">2x</span></td><td class="text"><pre class="prettyprint lang-js">import { IStack, Stack, StackObject, TypeSet } from "../src";
 import { IModel } from "../src/Model";
 import { IValueSerializer } from "../src/serialize/ValueSerializer";
 &nbsp;
@@ -252,11 +252,11 @@ export async function validateModel(model: IModel, obj: ModelValidate, serialize
 <span class="cstat-no" title="statement not covered" >         return</span>
 <span class="cstat-no" title="statement not covered" >      }</span>
 &nbsp;
-      if(member.type.type === TypeSet.ObjectRef) {
-         let valueJs = await serializer.toJs(member.value)
-         await validateObject(valueJs, obj[key])
-         continue
-      }
+      if(member.type.type === TypeSet.ObjectRef) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
+<span class="cstat-no" title="statement not covered" >         let valueJs = await serializer.toJs(member.value)</span>
+<span class="cstat-no" title="statement not covered" >         await validateObject(valueJs, obj[key])</span>
+<span class="cstat-no" title="statement not covered" >         continue</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
       
       expect(await serializer.toJs(member.value)).toEqual(obj[key])
    }
@@ -266,10 +266,10 @@ export async function validateObject&lt;T&gt;(it: T, obj: ObjectValidate): Promi
    expect(it).not.toBeFalsy()
 &nbsp;
    for(let key of Object.keys(obj)) {
-      if(!Array.isArray(obj[key]) &amp;&amp; typeof obj[key] === 'object') {
-         await validateObject(it[key], obj[key])
-         continue
-      }
+      if(!Array.isArray(obj[key]) &amp;&amp; typeof obj[key] === 'object') <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
+<span class="cstat-no" title="statement not covered" >         await validateObject(it[key], obj[key])</span>
+<span class="cstat-no" title="statement not covered" >         continue</span>
+<span class="cstat-no" title="statement not covered" >      }</span>
 &nbsp;
       expect(it[key]).toEqual(obj[key])
    }
@@ -280,7 +280,7 @@ export async function validateObject&lt;T&gt;(it: T, obj: ObjectValidate): Promi
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2022-11-02T18:31:52.557Z
+                at 2022-11-21T19:45:57.591Z
             </div>
         <script src="prettify.js"></script>
         <script>

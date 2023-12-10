@@ -11,7 +11,7 @@ export class GetManyObjectsEvent<T> extends Event {
     */
    wasCursorFound: boolean = false
 
-   constructor(readonly model: IModel, readonly options: PageRequest) {
+   constructor(readonly model: IModel, readonly page: PageRequest) {
       super(EventSet.GetManyObjects)
    }
 }

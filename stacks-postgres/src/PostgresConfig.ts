@@ -4,4 +4,5 @@ export type PostgresConfig = {
    port: number
    user: string
    password: string
+   pageLimit?: number  // The default page amount when performing a GetManyObjects
 }

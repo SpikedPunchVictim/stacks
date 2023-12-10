@@ -96,16 +96,16 @@ export class ValueSource implements IValueSource {
             return value
          }
 
-         let cast = value as Array<IValue>
+         let cast = value as IValue[]
 
-         if (cast.length == 0) {
-            throw new Error(`Encountered an error when determining the Type of a value. Received an empty Array. Array notation can only be used if it contains at least 1 element.`)
+         if (cast.length === 0) {
+            throw new Error("Encountered an error when determining the Type of a value. Received an empty Array. Array notation can only be used if it contains at least 1 element.")
          }
 
          let coercedItemType: IType | undefined = undefined
 
          if(coercedType !== undefined) {
-            if(coercedType.type == TypeSet.List) {
+            if(coercedType.type === TypeSet.List) {
                let list = coercedType as ListType
                coercedItemType = list.itemType
             }
@@ -116,7 +116,7 @@ export class ValueSource implements IValueSource {
          let allTypesEqual = cast.every(it => firstType.equals(it.type))
 
          if (!allTypesEqual) {
-            throw new Error(`Encountered an error when determinging the Type of a value. When specifying a List Type using Array notation, all Types in the Array must be the same.`)
+            throw new Error("Encountered an error when determinging the Type of a value. When specifying a List Type using Array notation, all Types in the Array must be the same.")
          }
 
          let list = new ListValue(firstType, context.serializer)
@@ -126,14 +126,14 @@ export class ValueSource implements IValueSource {
       } else if(Array.isArray(source)) {
          let array = source as any[]
 
-         if(array.length == 0) {
+         if(array.length === 0) {
             throw new Error(`Error resolving a Value. At least one item must be present in the Array to determine the List ItemType when resolving ${source}.`)
          }
 
          let coercedItemType: IType | undefined = undefined
 
          if(coercedType !== undefined) {
-            if(coercedType.type == TypeSet.List) {
+            if(coercedType.type === TypeSet.List) {
                let list = coercedType as ListType
                coercedItemType = list.itemType
             }

@@ -28,7 +28,7 @@
    */
   //"pnpmVersion": "4.14.4",
 
-  "npmVersion": "6.14.8",
+  "npmVersion": "8.3.1",
   // "yarnVersion": "1.9.4",
 
   /**
@@ -455,6 +455,11 @@
     {
       "packageName": "@spikedpunch/stacks-postgres",
       "projectFolder": "stacks-postgres"
+    },
+    {
+      "packageName": "@spikedpunch/stacks-test",
+      "projectFolder": "stacks-test",
+      "shouldPublish": false
     }
   ]
 }

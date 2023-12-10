@@ -14,8 +14,6 @@ model.symbols.push({
    name: 'postgres:
 })
 
-
-
 ```
 
 ## Model Symbols
@@ -52,3 +50,21 @@ model.symbols.push({
 | array | <item type>[] | Also supports List of Lists, ie `int[][]` |
 | Object Ref | table or composite type | Will use the Type's Table nme or Composite name |
 
+
+# Store Context
+
+TODO: Fill out
+
+```js
+name: 'stacks:postgres',
+version: this.version || 'version-not-set',
+store: {
+   config: this.config,
+   db: this.context.db,
+   tables: Array.from(this.context.tableMap.values())
+}
+```
+
+# Underlying Details
+
+* Search indexes are created on each table for the `id` column using btree.

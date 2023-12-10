@@ -71,8 +71,8 @@ export enum EventSet {
       //-------------------------------------------------------------------------------------------
       router.on<GetManyObjectsEvent<StackObject>>(EventSet.GetManyObjects, async (event: GetManyObjectsEvent<StackObject>) => {
          let modelDir = this.getModelDir(event.model.name)
-         let reqCursor = event.options.cursor || ''
-         let reqCount = event.options.limit == null ? 100 : event.options.limit
+         let reqCursor = event.page.cursor || ''
+         let reqCount = event.page.limit == null ? 100 : event.page.limit
 
          // Ignore any Temp files that may be in the directory
          let files = await fs.readdir(modelDir)

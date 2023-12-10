@@ -33,7 +33,6 @@
          ],
          "sourceMaps": true,
          "cwd": "${workspaceRoot}",
-         "protocol": "inspector",
          "smartStep": true,
          "env": {
             "NODE_PATH": "${workspaceRoot}/dev/node_modules",
@@ -58,7 +57,6 @@
          ],
          "sourceMaps": true,
          "cwd": "${workspaceRoot}",
-         "protocol": "inspector",
          "smartStep": true,
          "env": {
             "TS_NODE_PROJECT": "${workspaceRoot}/stacks-rest/tsconfig.json"
@@ -89,23 +87,48 @@
          "request": "launch",
          "smartStep": true,
          "skipFiles": [
-             "<node_internals>/**",
-             "node_modules/**"
+            "<node_internals>/**",
+            "node_modules/**"
          ],
          "program": "${workspaceFolder}/${relativeFile}",
          "cwd": "${workspaceFolder}/stacks-fs"
-     },
-     {
-      "name": "[stacks-postgres] JS | Current File",
-      "type": "node",
-      "request": "launch",
-      "smartStep": true,
-      "skipFiles": [
-          "<node_internals>/**",
-          "node_modules/**"
-      ],
-      "program": "${workspaceFolder}/${relativeFile}",
-      "cwd": "${workspaceFolder}/stacks-postgres"
-  }
+      },
+      {
+         "name": "[stacks-postgres] JS | Current File",
+         "type": "node",
+         "request": "launch",
+         "smartStep": true,
+         "skipFiles": [
+            "<node_internals>/**",
+            "node_modules/**"
+         ],
+         "program": "${workspaceFolder}/${relativeFile}",
+         "cwd": "${workspaceFolder}/stacks-postgres"
+      },
+      {
+         "name": "[stacks-postgres] TS | Current File",
+         "type": "node",
+         "request": "launch",
+         "args": [
+            "${relativeFile}"
+         ],
+         "runtimeArgs": [
+            "--nolazy",
+            "-r",
+            "ts-node/register"
+         ],
+         "sourceMaps": true,
+         "cwd": "${workspaceRoot}",
+         "smartStep": true,
+         "env": {
+            //"NODE_PATH": "${workspaceRoot}/dev/node_modules",
+            "NODE_PATH": "${workspaceRoot}/stacks-postgres/node_modules",
+            "TS_NODE_PROJECT": "${workspaceRoot}/stacks-postgres/tsconfig.json"
+         },
+         "skipFiles": [
+            "<node_internals>/**",
+            "node_modules/**"
+         ],
+      },
    ]
 }

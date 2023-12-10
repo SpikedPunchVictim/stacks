@@ -13,4 +13,7 @@ export type TableInfo = {
    model: IModel
    tableName: string
    columns: ColumnInfo[]
+   indexes: {
+      id: string
+   }
 }

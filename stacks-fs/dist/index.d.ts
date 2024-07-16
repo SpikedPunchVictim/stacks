@@ -1,5 +1,5 @@
 import { IPlugin, IStack, IEventRouter } from '@spikedpunch/stacks';
-export declare type FsOptions = {
+export type FsOptions = {
     objectNameField?: string;
 };
 /**

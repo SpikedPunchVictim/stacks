@@ -1,6 +1,6 @@
 import { IEvent } from "./Event";
 import { IEventRouter } from "./EventRouter";
-export declare type RfcHandler = (event: IEvent, err?: Error) => Promise<void>;
+export type RfcHandler = (event: IEvent, err?: Error) => Promise<void>;
 export interface IRequestForChangeSource {
     create(action: IEvent): IRequestForChange;
 }

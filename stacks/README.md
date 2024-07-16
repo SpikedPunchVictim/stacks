@@ -124,7 +124,7 @@ When creating Models, a unique name is passed in, as well as the set of paramete
 When setting the values for a Model, the system needs to know the Type and Value that is being set. For `string`, `number`, `boolean`, `Stacks` can infer the Type. For more complex Objects, like References to other Models, we need to specify the Type and Value.
 
 ```js
-let model = await stack.ctreate.model('name', {
+let model = await stack.create.model('name', {
    // The Type information can be infered on these Types
    string: `I'm a string`,
    int: -1,

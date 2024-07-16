@@ -17,6 +17,7 @@ export declare class PostgresPlugin implements IPlugin {
     createDbIfNotExists(dbName: string): Promise<void>;
     setup(stack: IStack, router: IEventRouter): Promise<void>;
     private bootstrapDb;
+    private buildSearchIndexes;
     private createTable;
     /**
      * Creates a Column for a Member.

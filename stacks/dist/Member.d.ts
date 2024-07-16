@@ -4,12 +4,12 @@ import { IType } from "./values/Type";
 import { CreateTypeHandler } from "./values/TypeSource";
 import { IValue } from "./values/Value";
 import { ValueCreateContext, ValueCreateParams } from "./values/ValueSource";
-export declare type MemberInfo = {
+export type MemberInfo = {
     type: IType | CreateTypeHandler;
     value: MemberValue;
     symbols?: SymbolEntry[];
 };
-export declare type MemberValue = ValueCreateParams | MemberInfo;
+export type MemberValue = ValueCreateParams | MemberInfo;
 /**
  * This interface represents the data structure storing an individual
  * Member in a Model

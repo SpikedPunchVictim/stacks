@@ -3,7 +3,7 @@ import { Kysely } from 'kysely';
 import { PostgresConfig } from './PostgresConfig';
 import { SymbolTable } from './SymbolTable';
 import { TableInfo } from './Table';
-export declare type Database = {
+export type Database = {
     [key: string]: any;
 };
 export declare class PluginContext {

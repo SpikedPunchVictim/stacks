@@ -26,18 +26,6 @@ export interface IUidKeeper {
      * @param modelId The associated Model ID
      */
     has(id: string, model: IModel): Promise<boolean>;
-    /**
-     * Registers an ID with the UidKeeper. Registered IDs won't be used again
-     *
-     * @param id The id to register
-     */
-    register(id: string): Promise<void>;
-    /**
-     * Unregisters an ID with the UidKeeper.
-     *
-     * @param id The id to unregister
-     */
-    unregister(id: string): Promise<void>;
 }
 export declare class UidKeeper implements IUidKeeper {
     get stack(): IStack | undefined;
@@ -49,6 +37,4 @@ export declare class UidKeeper implements IUidKeeper {
     generate(model: IModel): Promise<string>;
     generateLocal(): string;
     has(id: string, model: IModel): Promise<boolean>;
-    register(id: string): Promise<void>;
-    unregister(id: string): Promise<void>;
 }

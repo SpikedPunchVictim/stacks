@@ -4,8 +4,8 @@ import { IntType } from "./Int";
 import { StringType } from "./String";
 import { IType } from "./Type";
 import { UIntType } from "./UInt";
-export declare type TypeCreateParams = boolean | number | string | any[] | IType | CreateTypeHandler;
-export declare type CreateTypeHandler = (converter: TypeSource) => IType;
+export type TypeCreateParams = boolean | number | string | any[] | IType | CreateTypeHandler;
+export type CreateTypeHandler = (converter: TypeSource) => IType;
 export interface ITypeSource {
     readonly bool: BoolType;
     readonly int: IntType;

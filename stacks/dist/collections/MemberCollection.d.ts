@@ -5,6 +5,7 @@ import { IUidKeeper } from "../UidKeeper";
 import { PredicateHandler, VisitHandler } from "./Handlers";
 export interface IMemberCollection {
     readonly model: IModel;
+    readonly length: number;
     [Symbol.iterator](): Iterator<IMember>;
     add(name: string, value: MemberValue): Promise<void>;
     append(obj: ModelCreateParams): Promise<void>;
@@ -20,6 +21,7 @@ export interface IMemberCollection {
 }
 export declare class NoOpMemberCollection implements IMemberCollection {
     model: IModel;
+    get length(): number;
     constructor();
     add(name: string, value: MemberValue): Promise<void>;
     append(obj: ModelCreateParams): Promise<void>;
@@ -32,6 +34,7 @@ export declare class NoOpMemberCollection implements IMemberCollection {
 export declare class MemberCollection implements IMemberCollection {
     readonly model: IModel;
     readonly context: IStackContext;
+    get length(): number;
     get uid(): IUidKeeper;
     private members;
     constructor(model: IModel, context: IStackContext);

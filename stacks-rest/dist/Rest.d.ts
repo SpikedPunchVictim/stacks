@@ -1,10 +1,8 @@
-/// <reference types="koa-bodyparser" />
-/// <reference types="node" />
 import { IModel, IStack } from '@spikedpunch/stacks';
 import { Server } from 'http';
 import Koa from 'koa';
 import Router from '@koa/router';
-export declare type RestContext = {
+export type RestContext = {
     app: Koa;
     router: Router;
     stack: IStack;
@@ -12,22 +10,22 @@ export declare type RestContext = {
 export interface IRestMiddleware {
     setup(context: RestContext): Promise<void>;
 }
-export declare type RequestHandler = (ctx: Koa.Context, rest: RestContext, next: Koa.Next) => Promise<void>;
-export declare type ListenHandler = () => void;
-export declare type GetRequestOptions = {
+export type RequestHandler = (ctx: Koa.Context, rest: RestContext, next: Koa.Next) => Promise<void>;
+export type ListenHandler = () => void;
+export type GetRequestOptions = {
     model?: IModel;
     many?: RequestHandler | string[];
     single?: RequestHandler | string[];
 };
-export declare type PutRequestOptions = {
+export type PutRequestOptions = {
     model?: IModel;
     handler?: RequestHandler;
 };
-export declare type PostRequestOptions = {
+export type PostRequestOptions = {
     model?: IModel;
     handler?: RequestHandler;
 };
-export declare type DeleteRequestOptions = {
+export type DeleteRequestOptions = {
     model?: IModel;
     handler?: RequestHandler;
 };

@@ -15,11 +15,11 @@ export declare class ValidationReport {
     constructor();
     addError(error: Error): void;
 }
-export declare type ValidateResult = {
+export type ValidateResult = {
     success: boolean;
     error?: Error;
 };
-export declare type TypeInfo = {
+export type TypeInfo = {
     type: TypeSet;
     /**
      * This is set when the Type is a List

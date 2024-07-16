@@ -1,15 +1,15 @@
 import { StackObject } from '@spikedpunch/stacks';
-export declare type RestResponseMinimal = {
+export type RestResponseMinimal = {
     id: string;
 };
-export declare type RestResponseDetailed = {
+export type RestResponseDetailed = {
     id: string;
     [key: string]: any;
 };
-export declare type RestErrorResponse = {
+export type RestErrorResponse = {
     message: string;
 };
-export declare type RestSuccessResponse = {
+export type RestSuccessResponse = {
     message: string;
 };
 export declare function buildErrorResponse(errors: Error | Error[]): RestErrorResponse;

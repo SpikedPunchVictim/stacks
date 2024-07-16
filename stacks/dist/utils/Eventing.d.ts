@@ -1,16 +1,15 @@
-/// <reference types="node" />
 import { EventEmitter } from "events";
-export declare type EmitInfo = {
+export type EmitInfo = {
     source: EventEmitter | ICombinedEventEmitter;
     event: string;
     data: any;
 };
-export declare type AsyncEmitInfo = {
+export type AsyncEmitInfo = {
     event: string;
     data: any;
 };
-export declare type EventBusHandler = (data: any) => void;
-export declare type AsyncEventBusHandler = (data: any) => Promise<void>;
+export type EventBusHandler = (data: any) => void;
+export type AsyncEventBusHandler = (data: any) => Promise<void>;
 /**
  * Emits events from multiple objects. It will emit the event for
  * an EventEmitter and ICombinedEventEmitter source.

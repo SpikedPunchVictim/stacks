@@ -1,0 +1,7 @@
+packages:
+  - 'stacks'
+  - 'stacks-dynamo'
+  - 'stacks-fs'
+  - 'stacks-postgres'
+  - 'stacks-rest'
+  - 'stacks-test'

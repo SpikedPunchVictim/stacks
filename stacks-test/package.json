@@ -10,13 +10,13 @@
   "author": "William Hoopes",
   "license": "ISC",
   "dependencies": {
-    "@spikedpunch/stacks": "~0.0.1"
+    "@spikedpunch/stacks": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "~16.11.12",
-    "rimraf": "~3.0.2",
-    "ts-node": "~10.4.0",
-    "typescript": "~4.5.3",
-    "chai": "~4.3.7"
+    "@types/node": "~20.14.10",
+    "rimraf": "~6.0.1",
+    "ts-node": "~10.9.2",
+    "typescript": "~5.5.3",
+    "chai": "~5.1.1"
   }
 }

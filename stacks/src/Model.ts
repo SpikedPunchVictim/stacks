@@ -98,7 +98,7 @@ export interface IModel {
     * 
     * @param obj The Object to validate
     */
-   validate<T>(obj: T): Promise<ValidationReport>
+   validate<T extends object>(obj: T): Promise<ValidationReport>
 }
 
 export class NoOpModel implements IModel {
@@ -146,7 +146,7 @@ export class NoOpModel implements IModel {
       throw new Error(`Not Implemented`)
    }
 
-   validate<T>(obj: T): Promise<ValidationReport> {
+   validate<T extends object>(obj: T): Promise<ValidationReport> {
       throw new Error(`Not Implemented`)
    }
 }
@@ -268,7 +268,7 @@ export class Model implements IModel {
       return result as T
    }
 
-   async validate<T>(obj: T): Promise<ValidationReport> {
+   async validate<T extends object>(obj: T): Promise<ValidationReport> {
       let report = new ValidationReport()
 
       for (let key of Object.keys(obj)) {

@@ -1,5 +1,5 @@
 import { IMember, IModel } from "@spikedpunch/stacks";
-export declare type ColumnInfo = {
+export type ColumnInfo = {
     member: IMember;
     columnName: string;
     reference?: {
@@ -7,8 +7,11 @@ export declare type ColumnInfo = {
         model: IModel;
     };
 };
-export declare type TableInfo = {
+export type TableInfo = {
     model: IModel;
     tableName: string;
     columns: ColumnInfo[];
+    indexes: {
+        id: string;
+    };
 };

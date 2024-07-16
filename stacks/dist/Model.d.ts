@@ -9,21 +9,21 @@ import { MemberInfo } from "./Member";
  * The additional ObjectCreateParams on the type supports nested
  * values.
  */
-export declare type ObjectCreateParams = {
+export type ObjectCreateParams = {
     [key: string]: ValueCreateParams | ObjectCreateParams;
 };
-export declare type ModelCreateParams = {
+export type ModelCreateParams = {
     [key: string]: string | number | boolean | any[] | CreateValueHandler | MemberInfo;
 };
-export declare type SymbolEntry = {
+export type SymbolEntry = {
     name: string;
     value: any;
 };
-export declare type PageResponse<T> = {
+export type PageResponse<T> = {
     cursor: string;
     items: T[];
 };
-export declare type PageRequest = {
+export type PageRequest = {
     cursor?: string;
     limit?: number;
 };
@@ -79,7 +79,7 @@ export interface IModel {
      *
      * @param obj The Object to validate
      */
-    validate<T>(obj: T): Promise<ValidationReport>;
+    validate<T extends object>(obj: T): Promise<ValidationReport>;
 }
 export declare class NoOpModel implements IModel {
     readonly id: string;
@@ -95,7 +95,7 @@ export declare class NoOpModel implements IModel {
     getAll<T extends StackObject>(): Promise<T[]>;
     getMany<T extends StackObject>(req?: PageRequest): Promise<PageResponse<T>>;
     toJs<T>(): Promise<T>;
-    validate<T>(obj: T): Promise<ValidationReport>;
+    validate<T extends object>(obj: T): Promise<ValidationReport>;
 }
 export declare class Model implements IModel {
     get id(): string;
@@ -127,6 +127,6 @@ export declare class Model implements IModel {
     getAll<T extends StackObject>(): Promise<T[]>;
     getMany<T extends StackObject>(req?: PageRequest): Promise<PageResponse<T>>;
     toJs<T>(): Promise<T>;
-    validate<T>(obj: T): Promise<ValidationReport>;
+    validate<T extends object>(obj: T): Promise<ValidationReport>;
     private setId;
 }

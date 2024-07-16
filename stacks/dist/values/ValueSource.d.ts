@@ -9,12 +9,12 @@ import { IType } from "./Type";
 import { CreateTypeHandler, TypeCreateParams } from "./TypeSource";
 import { UIntValue } from "./UInt";
 import { IValue } from "./Value";
-export declare type ValueCreateContext = {
+export type ValueCreateContext = {
     model?: IModel;
 };
-export declare type CreateValueHandler = (value: IValueSource, ctx?: ValueCreateContext) => IValue | IValue[];
-export declare type ValueCreateParams = boolean | number | string | any[] | CreateValueHandler;
-export declare type NormalizedType = {
+export type CreateValueHandler = (value: IValueSource, ctx?: ValueCreateContext) => IValue | IValue[];
+export type ValueCreateParams = boolean | number | string | any[] | CreateValueHandler;
+export type NormalizedType = {
     [key: string]: IType;
 };
 export interface IValueSource {

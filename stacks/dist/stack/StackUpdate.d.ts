@@ -4,7 +4,7 @@ import { IModel } from "../Model";
 import { IOrchestrator } from "../orchestrator/Orchestrator";
 import { IStackContext } from "./StackContext";
 import { ModelCreateParams } from "..";
-export declare type UpdateObjectHandler<T extends StackObject> = (updated: T | undefined, exist: ExistState) => Promise<void>;
+export type UpdateObjectHandler<T extends StackObject> = (updated: T | undefined, exist: ExistState) => Promise<void>;
 export interface IStackUpdate {
     /**
      * Updates a Model

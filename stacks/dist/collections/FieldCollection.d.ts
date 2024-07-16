@@ -4,7 +4,7 @@ import { ValueCreateParams } from "../values/ValueSource";
 /**
  * Each Property is one of the TyepSet enums
  */
-export declare type FieldSwitchHandler = {
+export type FieldSwitchHandler = {
     [key: string]: (field: IField) => Promise<void>;
 };
 export interface IFieldCollection {

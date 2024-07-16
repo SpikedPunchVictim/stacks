@@ -1,5 +1,5 @@
 import { IStack } from "@spikedpunch/stacks";
-export declare type SymbolValueMap = {
+export type SymbolValueMap = {
     model: {
         prefix: string;
         defaults: {

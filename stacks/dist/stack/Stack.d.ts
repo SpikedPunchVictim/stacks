@@ -8,15 +8,15 @@ import { IStackCreate } from "./StackCreate";
 import { IStackDelete } from "./StackDelete";
 import { IStackGet } from "./StackGet";
 import { IStackUpdate } from "./StackUpdate";
-export declare type StackOptions = {
+export type StackOptions = {
     uidKeeper?: IUidKeeper;
 };
-export declare type StoreContext = {
+export type StoreContext = {
     name: string;
     version: string;
     store: any;
 };
-export declare type ApplyStoreContextHandler<T> = (contexts: StoreContext[]) => Promise<T>;
+export type ApplyStoreContextHandler<T> = (contexts: StoreContext[]) => Promise<T>;
 export interface IStack extends ICombinedEventEmitter {
     readonly create: IStackCreate;
     readonly delete: IStackDelete;

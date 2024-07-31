@@ -30,7 +30,7 @@
   "homepage": "https://github.com/SpikedPunchVictim/stacks#readme",
   "dependencies": {
     "@spikedpunch/stacks": "workspace:*",
-    "@aws-sdk/client-dynamodb": "~3.614.0",
+    "@aws-sdk/client-dynamodb": "~3.621.0",
     "dynatron": "~8.0.1",
     "fs-extra": "~11.2.0"
   },

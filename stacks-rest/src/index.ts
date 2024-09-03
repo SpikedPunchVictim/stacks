@@ -5,6 +5,7 @@ export {
    ListenHandler,
    PostRequestOptions,
    PutRequestOptions,
+   RestHandler,
    RequestHandler,
    RestContext,
    StacksRest

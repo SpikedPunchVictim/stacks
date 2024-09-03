@@ -36,7 +36,7 @@ export class FsPlugin implements IPlugin {
 
    private version: string | undefined = undefined // The plugin version
 
-   constructor(readonly baseDir: string, options: FsOptions) {
+   constructor(readonly baseDir: string, options?: FsOptions) {
       // TODO: Normalize baseDir (~, .., etc)
       this.options = options || {}
    }
@@ -111,7 +111,10 @@ export enum EventSet {
          let objects = new Array<StackObject>()
 
          for (let file of requestedFiles) {
-            objects.push(await fs.readJson(path.join(modelDir, file)))
+            objects.push({
+               id: file.slice(0, (".json".length * -1)),
+               ...await fs.readJson(path.join(modelDir, file))
+            })
          }
 
          event.results = {
@@ -121,7 +124,7 @@ export enum EventSet {
       })
 
       router.on(EventSet.GetStoreContext, async (event: GetStoreContextEvent) => {
-         if(this.version === undefined) {
+         if (this.version === undefined) {
             let pkg = await fs.readJson(path.join(__dirname, '..', 'package.json'))
             this.version = pkg.version
          }
@@ -151,7 +154,7 @@ export enum EventSet {
 
       //-------------------------------------------------------------------------------------------
       router.on<GetObjectEvent<StackObject>>(EventSet.GetObject, async (event: GetObjectEvent<StackObject>) => {
-         let objectPath = this.getObjectPath(event.model.id, event.id)
+         let objectPath = this.getObjectPath(event.model.name, event.id)
 
          try {
             let obj = await fs.readJson(objectPath)

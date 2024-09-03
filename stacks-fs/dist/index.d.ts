@@ -13,7 +13,7 @@ export declare class FsPlugin implements IPlugin {
     readonly name: string;
     readonly options: FsOptions;
     private version;
-    constructor(baseDir: string, options: FsOptions);
+    constructor(baseDir: string, options?: FsOptions);
     setup(stack: IStack, router: IEventRouter): Promise<void>;
     private getModelDir;
     private getObjectPath;

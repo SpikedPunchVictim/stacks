@@ -12,10 +12,13 @@ export interface IRestMiddleware {
 }
 export type RequestHandler = (ctx: Koa.Context, rest: RestContext, next: Koa.Next) => Promise<void>;
 export type ListenHandler = () => void;
+export declare enum RestHandler {
+    NoOp = "::noop"
+}
 export type GetRequestOptions = {
     model?: IModel;
-    many?: RequestHandler | string[];
-    single?: RequestHandler | string[];
+    many?: RequestHandler | string[] | RestHandler;
+    single?: RequestHandler | string[] | RestHandler;
 };
 export type PutRequestOptions = {
     model?: IModel;
@@ -29,12 +32,15 @@ export type DeleteRequestOptions = {
     model?: IModel;
     handler?: RequestHandler;
 };
+export type StackRestOptions = {
+    cors?: boolean;
+};
 export declare class StacksRest {
     readonly app: Koa;
     readonly router: Router;
     readonly stack: IStack;
     get restContext(): RestContext;
-    constructor(stack: IStack);
+    constructor(stack: IStack, options?: StackRestOptions);
     use(middleware: IRestMiddleware): Promise<void>;
     /**
      * Defines a GET REST endpoint.
@@ -65,6 +71,27 @@ export declare class StacksRest {
      * @param options The options that define the endpoint
      */
     put(urlPath: string, options: PutRequestOptions): void;
+    /**
+     *
+     * Consider adding an easier way to modify the request:
+     *    (
+     *       validate: {
+     *          required: {
+     *                one: { type: 'string' }
+     *               two: { type: 'number' }
+     *          },
+     *       handler: ({ body, params, qs, model, stack}) => {
+     *       model.create<Model>({
+     *          one: body.one
+     *       })
+     *
+     *    }
+     *
+     *
+     * @param urlPath
+     * @param options
+     * @returns
+     */
     post(urlPath: string, options: PostRequestOptions): void;
     del(urlPath: string, options: DeleteRequestOptions): void;
     listen(port?: number, handler?: ListenHandler): Server;

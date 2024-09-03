@@ -5,16 +5,17 @@ import {
    StackObject
 } from '@spikedpunch/stacks'
 
-import { 
+import {
    buildDetailedResponse,
    buildErrorResponse,
-   buildMinimalResponse 
+   buildMinimalResponse
 } from './Response'
 
 import { Server } from 'http'
 import Koa from 'koa'
 import Router from '@koa/router'
 import bodyparser from 'koa-bodyparser'
+import cors from "@koa/cors"
 
 export type RestContext = {
    app: Koa
@@ -29,10 +30,14 @@ export interface IRestMiddleware {
 export type RequestHandler = (ctx: Koa.Context, rest: RestContext, next: Koa.Next) => Promise<void>
 export type ListenHandler = () => void
 
+export enum RestHandler {
+   NoOp = "::noop"
+}
+
 export type GetRequestOptions = {
    model?: IModel
-   many?: RequestHandler | string[]
-   single?: RequestHandler | string[]
+   many?: RequestHandler | string[] | RestHandler
+   single?: RequestHandler | string[] | RestHandler
 }
 
 export type PutRequestOptions = {
@@ -50,6 +55,33 @@ export type DeleteRequestOptions = {
    handler?: RequestHandler
 }
 
+export type StackRestOptions = {
+   cors?: boolean
+}
+
+
+/*
+   Potential future of defining get:
+
+   rest.get(UrlNames.paths.users, {
+      model: user,
+      many: ({ props }) => props(["name", "verified", "image"]),
+      single: ({ noop } => noop
+   })
+*/
+
+// export class GetDefineOptions = {
+//    props
+// }
+
+// export type GetDefineHandler = (opts: GetDefineOptions) => RequestHandler | undefined
+
+// export type Get2Options = {
+//    model?: IModel
+//    single?: GetDefineHandler
+//    many?: GetDefineHandler
+// }
+
 export class StacksRest {
    readonly app: Koa
    readonly router: Router
@@ -63,9 +95,14 @@ export class StacksRest {
       }
    }
 
-   constructor(stack: IStack) {
+   constructor(stack: IStack, options?: StackRestOptions) {
       this.stack = stack
       this.app = new Koa()
+
+      if (options?.cors) {
+         this.app.use(cors())
+      }
+
       this.router = new Router()
    }
 
@@ -114,7 +151,9 @@ export class StacksRest {
 
             await options.many(ctx, this.restContext, next)
          })
-      } else {
+      } else if (typeof options.many === "string" && options.many === RestHandler.NoOp) {
+         // Do nothing      
+      } else { // Default Behavior
          let props = new Array<string>()
 
          if (options.model == null || options.model === undefined) {
@@ -148,7 +187,9 @@ export class StacksRest {
 
             await options.single(ctx, this.restContext, next)
          })
-      } else {
+      } else if (typeof options.single === "string" && options.single === RestHandler.NoOp) {
+         // Do nothing      
+      } else { // Default behavior
          let props = new Array<string>()
 
          if (Array.isArray(options.single)) {
@@ -157,10 +198,10 @@ export class StacksRest {
             }
 
             props.push(...options.single)
-         } else if(options.single == null) {
+         } else if (options.single == null) {
             // Default is to use the Model's properties
             //@ts-ignore
-            for(let member of options.model?.members) {
+            for (let member of options.model?.members) {
                props.push(member.name)
             }
          }
@@ -172,9 +213,9 @@ export class StacksRest {
 
             let result = await model.get<StackObject>(id)
 
-            if(result === undefined) {
+            if (result === undefined) {
                ctx.status = 400
-               ctx.body = { message: `No Object with id ${id} exists `}
+               ctx.body = { message: `No Object with id ${id} exists ` }
                return
             }
 
@@ -200,16 +241,16 @@ export class StacksRest {
       options.model = options.model || undefined
       options.handler = options.handler || undefined
 
-      if(options.handler !== undefined) {
+      if (options.handler !== undefined) {
          this.router.put(urlPath, async (ctx: Koa.Context, next: Koa.Next) => {
-            if(options.handler === undefined) {
+            if (options.handler === undefined) {
                throw new Error(`When defining the ${urlPath} PUT endoint, the 'handler' property is expected to be a function, received a 'undefined' instead.`)
             }
-            
+
             await options.handler(ctx, this.restContext, next)
          })
       } else {
-         if(options.model == null) {
+         if (options.model == null) {
             throw new Error(`When defining the ${urlPath} PUT request, the 'model' property is expected when a 'handler' function is not provided.`)
          }
 
@@ -226,34 +267,34 @@ export class StacksRest {
 
             let obj = await model.get(id)
 
-            if(obj === undefined) {
-               ctx.throw(400, { message: `No Object with id ${id} exists `})
+            if (obj === undefined) {
+               ctx.throw(400, { message: `No Object with id ${id} exists ` })
                return
             }
 
-            for(let prop of Object.keys(body)) {
+            for (let prop of Object.keys(body)) {
                obj[prop] = body[prop]
             }
 
             let valid = await model.validate(obj)
 
-            if(!valid.success) {
+            if (!valid.success) {
                let errors = new Array<Error>()
-               for(let result of valid.results) {
-                  if(result.success == false && result.error != null) {
+               for (let result of valid.results) {
+                  if (result.success == false && result.error != null) {
                      errors.push(result.error)
                   }
                }
 
                ctx.throw(400, buildErrorResponse(errors))
-               return                 
+               return
             }
 
             await model.save(obj)
 
             let props = new Array<string>()
 
-            for(let member of model.members) {
+            for (let member of model.members) {
                props.push(member.name)
             }
 
@@ -263,14 +304,35 @@ export class StacksRest {
       }
    }
 
+   /**
+    * 
+    * Consider adding an easier way to modify the request:
+    *    (
+    *       validate: {
+    *          required: {
+    *                one: { type: 'string' }
+    *               two: { type: 'number' }
+    *          },
+    *       handler: ({ body, params, qs, model, stack}) => {
+    *       model.create<Model>({
+    *          one: body.one
+    *       })
+    * 
+    *    }
+    *    
+    * 
+    * @param urlPath 
+    * @param options 
+    * @returns 
+    */
    post(urlPath: string, options: PostRequestOptions): void {
       options = options || {}
       options.model = options.model || undefined
       options.handler = options.handler || undefined
 
-      if(options.handler !== undefined) {
+      if (options.handler !== undefined) {
          this.router.post(urlPath, async (ctx: Koa.Context, next: Koa.Next) => {
-            if(options.handler != null) {
+            if (options.handler != null) {
                await options.handler(ctx, this.restContext, next)
             }
          })
@@ -278,7 +340,7 @@ export class StacksRest {
          return
       }
 
-      if(options.model === undefined) {
+      if (options.model === undefined) {
          throw new Error(`When defining the POST ${urlPath} endpoint, 'model' must be defined if a handler isn't provided`)
       }
 
@@ -304,9 +366,9 @@ export class StacksRest {
       options.model = options.model || undefined
       options.handler = options.handler || undefined
 
-      if(options.handler !== undefined) {
+      if (options.handler !== undefined) {
          this.router.delete(urlPath, async (ctx: Koa.Context, next: Koa.Next) => {
-            if(options.handler != null) {
+            if (options.handler != null) {
                await options.handler(ctx, this.restContext, next)
             }
          })
@@ -314,7 +376,7 @@ export class StacksRest {
          return
       }
 
-      if(options.model === undefined) {
+      if (options.model === undefined) {
          throw new Error(`When defining the DELETE ${urlPath} endpoint, 'model' must be defined if a handler isn't provided`)
       }
 
@@ -324,7 +386,7 @@ export class StacksRest {
 
          let obj = await model.get(id)
 
-         if(obj === undefined) {
+         if (obj === undefined) {
             ctx.status = 200
             ctx.body = undefined
             return
@@ -337,7 +399,7 @@ export class StacksRest {
       })
    }
 
-   listen(port: number = 3401, handler: ListenHandler = () => {}): Server {
+   listen(port: number = 3401, handler: ListenHandler = () => { }): Server {
       this.app
          .use(bodyparser())
          .use(this.router.routes())

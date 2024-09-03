@@ -1,6 +1,6 @@
 # stacks
 
-A data modeling system that allows you to separate your data from your implementation.
+A data modeling system that allows you to separate your data from your logic. Define your data structures (`Models`) in your `Stack`, and use them throughout your codebase as you normally would. A single line of code selects your storage/caching options.  Create, query, and delete the data objects as you use them,
 
 
 # Install
@@ -15,9 +15,19 @@ npm install @spikedpunch/stacks
 
 ```js
 import { Stack, StackObject } from '@spikedpunch/stacks'
+import { PostgresPlugin } from '@spikedpunch/stacks-postgres'
 
 // Create a new Stack
 let stack = Stack.create()
+
+// Add multiple backends or caches - even at the same time
+await stack.use(new PostgresPlugin({
+   database: "data",
+   host: "localhost,
+   port: 5432
+   user: "admin",
+   password: "admin"
+}))
 
 // Define Types as usual, just extend the type with
 // the StackObject type
